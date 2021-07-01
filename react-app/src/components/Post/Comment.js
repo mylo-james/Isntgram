@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { RiHeartLine } from "react-icons/ri";
-import { PostContext, UserContext } from "../../context";
+import { PostContext, UserContext } from "../../Contexts";
 import { backendURL } from "../../config";
 import { toast } from "react-toastify";
 
@@ -22,12 +22,12 @@ const CommentWrapper = styled.div`
   }
 
   .liked-comment {
-      cursor: pointer;
+    cursor: pointer;
     color: rgb(237, 73, 86);
   }
 
   .unliked-comment {
-      cursor: pointer;
+    cursor: pointer;
     color: #8e8e8e;
   }
 `;
@@ -124,7 +124,6 @@ const Comment = ({
           newPostData.comments[commentIdx].likes_comment = newList;
           setPostData(newPostData);
         }
-
       }
     } catch (e) {
       console.error(e);

@@ -1,8 +1,8 @@
 import { useContext, useState, useEffect } from "react";
 import styled from "styled-components";
 import { backendURL } from "../../config";
-import {fadeIn} from "../../Styles/animations"
-import { UserContext, ProfileContext } from "../../context";
+import { fadeIn } from "../../Styles/animations";
+import { UserContext, ProfileContext } from "../../Contexts";
 
 const FollowNotificationWrapper = styled.div`
   display: flex;
@@ -29,117 +29,108 @@ const FollowNotificationWrapper = styled.div`
 `;
 
 const FollowNotification = (props) => {
+  const { currentUserId } = useContext(UserContext);
+  const { profileData, setProfileData } = useContext(ProfileContext);
+  const [followingList, setFollowingList] = useState([]);
 
-    const { currentUserId } = useContext(UserContext);
-    const { profileData, setProfileData } = useContext(ProfileContext);
-    const [followingList, setFollowingList] = useState([])
+  useEffect(() => {
+    if (!profileData) return;
+    const resFollowingList = profileData.followingList.map((followingEntry) => {
+      return followingEntry.user_followed_id;
+    });
+    setFollowingList(resFollowingList);
+  }, [profileData, setFollowingList]);
 
-    useEffect(()=>{
-        if(!profileData) return
-         const resFollowingList = profileData.followingList.map((followingEntry) => {
-           return followingEntry.user_followed_id;
-         });
-         setFollowingList(resFollowingList);
+  const followUser = async () => {
+    const body = { userId: currentUserId, userFollowedId: props.user.id };
+    try {
+      const res = await fetch(`${backendURL}/follow`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
 
-    },[profileData, setFollowingList])
+      if (!res.ok) throw res;
 
+      const response = await res.json();
 
+      const updatesList = [...profileData.followingList, response];
+      setProfileData({ ...profileData, ...{ followingList: updatesList } });
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
-     const followUser = async () => {
-       const body = { userId: currentUserId, userFollowedId: props.user.id };
-       try {
-         const res = await fetch(`${backendURL}/follow`, {
-           method: "POST",
-           headers: {
-             "Content-Type": "application/json",
-           },
-           body: JSON.stringify(body),
-         });
+  const unfollowUser = async () => {
+    const body = { userId: currentUserId, userFollowedId: props.user.id };
+    try {
+      const res = await fetch(`${backendURL}/follow`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
 
+      if (!res.ok) throw res;
 
+      const response = await res.json();
 
-         if (!res.ok) throw res;
+      const { user_followed_id: deletedId } = response;
 
-         const response = await res.json();
+      const filteredList = profileData.followingList.filter(
+        (user) => user.user_followed_id !== deletedId
+      );
+      setProfileData({
+        ...profileData,
+        ...{ followingList: filteredList },
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
-         const updatesList = [...profileData.followingList, response];
-         setProfileData({ ...profileData, ...{ followingList: updatesList } });
-       } catch (e) {
-         console.error(e);
-       }
-     };
-
-
-      const unfollowUser = async () => {
-        const body = { userId: currentUserId, userFollowedId: props.user.id };
-        try {
-          const res = await fetch(`${backendURL}/follow`, {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(body),
-          });
-
-          if (!res.ok) throw res;
-
-          const response = await res.json();
-
-
-          const { user_followed_id: deletedId } = response;
-
-
-          const filteredList = profileData.followingList.filter(
-            (user) => user.user_followed_id !== deletedId
-          );
-          setProfileData({
-            ...profileData,
-            ...{ followingList: filteredList },
-          });
-        } catch (e) {
-          console.error(e);
-        }
-      };
-
-    if (!followingList) return null
-    return (
-      <FollowNotificationWrapper style={props.style}>
-        <>
-          <a href={`/profile/${props.user.id}`}>
-            <img
-              className="avatar"
-              src={props.user.profile_image_url}
-              alt={props.user.full_name}
-            />
-          </a>
-          <p>
-            <a href={`/profile/${props.user.id}`}>{props.user.username} </a>
-            started following you!
-          </p>
-          {followingList.includes(props.user.id) ? (
-            <div className="buttonWrapper">
-              <button style={{ width: "85px" }} onClick={unfollowUser}>
-                Following{" "}
-              </button>
-            </div>
-          ) : (
-            <div>
-              <button
-                style={{
-                  width: "85px",
-                  outline: "0",
-                  backgroundColor: "#0096F5",
-                  color: "white",
-                }}
-                onClick={followUser}
-              >
-                Follow
-              </button>
-            </div>
-          )}
-        </>
-      </FollowNotificationWrapper>
-    );
+  if (!followingList) return null;
+  return (
+    <FollowNotificationWrapper style={props.style}>
+      <>
+        <a href={`/profile/${props.user.id}`}>
+          <img
+            className="avatar"
+            src={props.user.profile_image_url}
+            alt={props.user.full_name}
+          />
+        </a>
+        <p>
+          <a href={`/profile/${props.user.id}`}>{props.user.username} </a>
+          started following you!
+        </p>
+        {followingList.includes(props.user.id) ? (
+          <div className="buttonWrapper">
+            <button style={{ width: "85px" }} onClick={unfollowUser}>
+              Following{" "}
+            </button>
+          </div>
+        ) : (
+          <div>
+            <button
+              style={{
+                width: "85px",
+                outline: "0",
+                backgroundColor: "#0096F5",
+                color: "white",
+              }}
+              onClick={followUser}
+            >
+              Follow
+            </button>
+          </div>
+        )}
+      </>
+    </FollowNotificationWrapper>
+  );
 };
 
 export default FollowNotification;

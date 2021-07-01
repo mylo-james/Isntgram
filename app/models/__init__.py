@@ -2,5 +2,13 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-from . import (comments, follows, likes, messages, posts,
-               saved_posts, tags, users, conversations, user_conversations)
+from .comment import Comment
+from .conversation import Conversation
+from .follow import Follow
+from .like import Like
+from .message import Message
+from .post import Post
+from .saved_post import Saved_Post
+from .tag import Tag
+from .user_conversation import User_Conversation
+from .user import User

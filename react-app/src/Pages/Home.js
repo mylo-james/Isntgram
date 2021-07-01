@@ -3,7 +3,7 @@ import InfiniteScroll from "react-infinite-scroller";
 import styled from "styled-components";
 import Post from "../components/Post/Post";
 import { backendURL } from "../config";
-import { UserContext } from "../context";
+import { UserContext } from "../Contexts";
 import NoFollows from "../components/NoFollows";
 import Loading from "../components/Loading/Loading";
 

@@ -1,19 +1,13 @@
 from flask import Blueprint, request, jsonify
 from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
-from ..models import db
-from ..models.posts import Post
-from ..models.users import User
-from ..models.follows import Follow
-from ..models.likes import Like
-from ..models.comments import Comment
-from ..auth import require_auth
-from random import randint
-
-bp = Blueprint("posts", __name__, url_prefix="/api/post")
+from ..models import db, Post, User, Follow, Like, Comment
 
 
-@bp.route('/scroll/<length>')
+post_routes = Blueprint("posts", __name__)
+
+
+@post_routes.route('/scroll/<length>')
 def index(length):
     length = int(length)
     post_list = []
@@ -32,7 +26,7 @@ def index(length):
     return {"posts": post_list}
 
 
-@bp.route('/<id>/scroll/<length>')
+@post_routes.route('/<id>/scroll/<length>')
 def home_feed(id, length):
     length = int(length)
     post_list = []
@@ -85,7 +79,7 @@ def home_feed(id, length):
     return {"posts": post_list}
 
 
-@bp.route('/<post_id>')
+@post_routes.route('/<post_id>')
 def get_post(post_id):
 
     post = Post.query.filter(Post.id == post_id).first()

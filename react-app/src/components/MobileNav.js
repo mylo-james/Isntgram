@@ -7,7 +7,7 @@ import {
   RiHeartLine,
   RiSearchLine,
 } from "react-icons/ri";
-import { UserContext } from "../context";
+import { UserContext } from "../Contexts";
 
 const NavContainer = styled.div`
   position: fixed;
@@ -50,7 +50,7 @@ const NavContainer = styled.div`
   }
 
   @media screen and (min-width: 475px) {
-    display: none
+    display: none;
   }
 
   @media screen and (min-width: 1000px) {

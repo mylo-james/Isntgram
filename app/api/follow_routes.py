@@ -1,17 +1,15 @@
 from flask import Blueprint, request, jsonify
 from sqlalchemy.orm import joinedload
-from ..models import db
-from ..models.users import User
-from ..models.follows import Follow
-from ..auth import require_auth
+from ..models import User, Follow, db
+
 
 #  following = /:id/following
 #  follows = /:id
 
-bp = Blueprint("follow", __name__)
+follow_routes = Blueprint("follow", __name__)
 
 # users who follow user of <id>
-@bp.route('/<id>')
+@follow_routes.route('/<id>')
 def getFollows(id):
     follows = Follow.query.filter(Follow.user_followed_id == id).all()
 
@@ -21,7 +19,7 @@ def getFollows(id):
         followsList.append(user.to_dict())
     return {"users": followsList}
 
-@bp.route('<id>/following')
+@follow_routes.route('<id>/following')
 def getFollowing(id):
     follows = Follow.query.filter(Follow.user_id == id).all()
 
@@ -31,7 +29,7 @@ def getFollowing(id):
         followsList.append(user.to_dict())
     return {"users": followsList}
 
-@bp.route('', methods=["POST"])
+@follow_routes.route('', methods=["POST"])
 def followUser():
     data = request.json
     exists = Follow.query.filter(Follow.user_id == data['userId']).filter(Follow.user_followed_id == data['userFollowedId']).first()
@@ -42,7 +40,7 @@ def followUser():
     db.session.commit()
     return follow.to_dict()
 
-@bp.route('', methods = ["DELETE"])
+@follow_routes.route('', methods = ["DELETE"])
 def deleteFollow():
     data = request.json
     print(data)

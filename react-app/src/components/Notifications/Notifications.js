@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import styled from "styled-components";
 import { backendURL } from "../../config";
-import { UserContext, ProfileContext } from "../../context";
+import { UserContext, ProfileContext } from "../../Contexts";
 import CommentNotification from "./CommentNotification";
 import FollowNotification from "./FollowNotification";
 import LikeNotification from "./LikeNotification";

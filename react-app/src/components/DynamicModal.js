@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { UserContext, ProfileContext } from "../context";
+import { UserContext, ProfileContext } from "../Contexts";
 import { backendURL } from "../config";
 const ModalWrapper = styled.div`
   width: 260px;
@@ -153,8 +153,8 @@ const DynamicModal = (props) => {
       setCurrentUserFollows([...currentUserFollows, id]);
 
       if (profileData.user.id === currentUserId) {
-        const updatedFollowingList = [...profileData.followingList, response]
-        setProfileData({...profileData, followingList: updatedFollowingList})
+        const updatedFollowingList = [...profileData.followingList, response];
+        setProfileData({ ...profileData, followingList: updatedFollowingList });
       }
     } catch (e) {
       console.error(e);
@@ -184,8 +184,10 @@ const DynamicModal = (props) => {
       setCurrentUserFollows(currentUserFollowsCopy);
 
       if (profileData.user.id === currentUserId) {
-        const updatedFollowingList = profileData.followingList.filter(user => user.user_followed_id !== id)
-        setProfileData({...profileData, followingList: updatedFollowingList})
+        const updatedFollowingList = profileData.followingList.filter(
+          (user) => user.user_followed_id !== id
+        );
+        setProfileData({ ...profileData, followingList: updatedFollowingList });
       }
     } catch (e) {
       console.error(e);

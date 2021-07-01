@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { backendURL } from "../../config";
-import { UserContext } from "../../context";
+import { UserContext } from "../../Contexts";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import styled from "styled-components";

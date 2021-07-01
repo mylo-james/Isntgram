@@ -3,7 +3,7 @@ import styled from "styled-components";
 import ProfileHeader from "../components/Profile/ProfileHeader";
 import ProfileMiddle from "../components/Profile/ProfileMiddle";
 import ProfilePosts from "../components/Profile/ProfilePosts";
-import { ProfileContext, UserContext } from "../context";
+import { ProfileContext, UserContext } from "../Contexts";
 import LoadingPage from "../components/Loading/LoadingPage";
 import { backendURL } from "../config";
 

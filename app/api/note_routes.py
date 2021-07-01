@@ -1,17 +1,11 @@
 from flask import Blueprint, request
 from sqlalchemy.orm import joinedload
-from ..models import db
-from ..models.posts import Post
-from ..models.users import User
-from ..models.follows import Follow
-from ..models.likes import Like
-from ..models.comments import Comment
-from ..auth import require_auth
+from ..models import db, Post, User, Follow, Like, Comment
 
-bp = Blueprint("notification", __name__)
+note_routes = Blueprint("note", __name__)
 
 
-@bp.route('/<id>/scroll/<length>')
+@note_routes.route('/<id>/scroll/<length>')
 def index(id, length):
     length = int(length)
 
@@ -66,4 +60,4 @@ def index(id, length):
     sorted_note_list = sorted(note_list, key=lambda note: note['created_at'])
     sorted_note_list.reverse()
 
-    return {"notifications": sorted_note_list[length: length + 20]}
+    return {"notes": sorted_note_list[length: length + 20]}

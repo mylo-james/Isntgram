@@ -1,16 +1,15 @@
 import { useContext } from "react";
 import styled from "styled-components";
 import { NavLink, Link } from "react-router-dom";
-import navImage from "../Images/logo.svg"
+import navImage from "../Images/logo.svg";
 import MobileNav from "./MobileNav";
 import {
   RiHome5Line,
   RiCamera2Line,
-
   RiHeartLine,
-  RiSearchLine
+  RiSearchLine,
 } from "react-icons/ri";
-import { UserContext } from "../context";
+import { UserContext } from "../Contexts";
 
 const NavContainer = styled.div`
   position: fixed;
@@ -30,8 +29,6 @@ const NavContainer = styled.div`
     width: 100%;
     max-width: 935px;
     padding: 0 20px;
-
-
   }
 
   .navImage {
@@ -60,12 +57,11 @@ const NavContainer = styled.div`
     nav ul {
       display: none;
     }
-    .navImage{
+    .navImage {
       display: flex;
       justify-content: center;
     }
   }
-
 
   .active {
     color: #0095f6 !important;
@@ -84,14 +80,12 @@ const NavProfilePic = styled.div`
   width: 25px;
   height: 25px;
   border-radius: 400px;
-  overflow:hidden;
+  overflow: hidden;
 
   .navProfilePic {
     width: inherit;
     height: inherit;
     object-fit: cover;
-
-
   }
 `;
 
@@ -99,50 +93,50 @@ const Nav = () => {
   const { currentUserProfilePic, currentUserId } = useContext(UserContext);
   return (
     <>
-    <NavContainer>
-      <nav>
-        <Link to="/">
-          <img className="navImage" src={navImage} alt="logo" />
-        </Link>
-        <ul>
-          <li>
-            <NavLink exact activeClassName="active" to="/">
-              <RiHome5Line className="nav-icon" />
-            </NavLink>
-          </li>
-          <li>
-            <NavLink activeClassName="active" to="/explore">
-              <RiSearchLine className="nav-icon" />
-            </NavLink>
-          </li>
+      <NavContainer>
+        <nav>
+          <Link to="/">
+            <img className="navImage" src={navImage} alt="logo" />
+          </Link>
+          <ul>
+            <li>
+              <NavLink exact activeClassName="active" to="/">
+                <RiHome5Line className="nav-icon" />
+              </NavLink>
+            </li>
+            <li>
+              <NavLink activeClassName="active" to="/explore">
+                <RiSearchLine className="nav-icon" />
+              </NavLink>
+            </li>
             <li>
               <NavLink activeClassName="active" to="/upload">
                 <RiCamera2Line className="nav-icon" />
               </NavLink>
             </li>
-          <li>
-            <NavLink activeClassName="active" to="/notifications">
-              <RiHeartLine className="nav-icon" />
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              activeClassName="activeAvatar"
-              to={`/profile/${currentUserId}`}
-            >
-              <NavProfilePic>
-                <img
-                  className="navProfilePic"
-                  src={currentUserProfilePic}
-                  alt="avatar"
-                />
-              </NavProfilePic>
-            </NavLink>
-          </li>
-        </ul>
-      </nav>
-    </NavContainer>
-    <MobileNav/>
+            <li>
+              <NavLink activeClassName="active" to="/notifications">
+                <RiHeartLine className="nav-icon" />
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                activeClassName="activeAvatar"
+                to={`/profile/${currentUserId}`}
+              >
+                <NavProfilePic>
+                  <img
+                    className="navProfilePic"
+                    src={currentUserProfilePic}
+                    alt="avatar"
+                  />
+                </NavProfilePic>
+              </NavLink>
+            </li>
+          </ul>
+        </nav>
+      </NavContainer>
+      <MobileNav />
     </>
   );
 };

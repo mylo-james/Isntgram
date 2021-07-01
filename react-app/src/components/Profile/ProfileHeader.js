@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import styled from "styled-components";
 import Modal from "react-modal";
 import DynamicModal from "../DynamicModal";
-import { ProfileContext, UserContext } from "../../context";
+import { ProfileContext, UserContext } from "../../Contexts";
 import ProfilePicModal from "./ProfilePicModal";
 import { RiLogoutBoxRLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
@@ -275,8 +275,17 @@ const ProfileHeader = (props) => {
       {windowSize < 735 ? (
         <ProfileHeaderWrapper>
           <ProfileImgWrapper>
-            <ButtonWrapper style={{cursor: 'default'}} onClick={currentUserId === profileId ? changeProfImg : ''}>
-              <img style={{cursor: currentUserId === profileId ? 'pointer' : 'default' }} src={profileImg} alt="avatar" />
+            <ButtonWrapper
+              style={{ cursor: "default" }}
+              onClick={currentUserId === profileId ? changeProfImg : ""}
+            >
+              <img
+                style={{
+                  cursor: currentUserId === profileId ? "pointer" : "default",
+                }}
+                src={profileImg}
+                alt="avatar"
+              />
             </ButtonWrapper>
             {isEditProfilePicOpen ? (
               <ProfilePicModal
@@ -321,8 +330,16 @@ const ProfileHeader = (props) => {
         </ProfileHeaderWrapper>
       ) : (
         <ProfileHeaderBig>
-          <BigProfileImageWrapper onClick={currentUserId === profileId ? changeProfImg : ''}>
-            <img style={{cursor: currentUserId === profileId ? 'pointer' : 'default' }} src={profileImg} alt="avatar" />
+          <BigProfileImageWrapper
+            onClick={currentUserId === profileId ? changeProfImg : ""}
+          >
+            <img
+              style={{
+                cursor: currentUserId === profileId ? "pointer" : "default",
+              }}
+              src={profileImg}
+              alt="avatar"
+            />
           </BigProfileImageWrapper>
           {isEditProfilePicOpen ? (
             <ProfilePicModal

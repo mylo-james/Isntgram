@@ -1,13 +1,11 @@
 from flask import Blueprint, request
-from ..models import db
-from ..models.comments import Comment
-from ..models.users import User
-from ..models.likes import Like
-
-bp = Blueprint("comment", __name__)
+from ..models import Comment, User, Like, db
 
 
-@bp.route('', methods=["POST"])
+comment_routes = Blueprint("comment", __name__)
+
+
+@comment_routes.route('', methods=["POST"])
 def postComment():
     data = request.json
     print(data)

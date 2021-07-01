@@ -4,7 +4,7 @@ import ModalPost from "./ModalPost";
 import Modal from "react-modal";
 import { AiOutlineEllipsis } from "react-icons/ai";
 import { Link } from "react-router-dom";
-import {PostContext} from '../../context'
+import { PostContext } from "../../Contexts";
 
 const PostHeaderWrapper = styled.div`
   display: flex;
@@ -50,18 +50,16 @@ const PostHeaderWrapper = styled.div`
 const PostHeader = (props) => {
   const [isOpen, setIsOpen] = useState(false);
   const outside = useRef();
-  const {postData} = useContext(PostContext)
-
+  const { postData } = useContext(PostContext);
 
   let { userPic, username, postId, userId, isSinglePost } = props;
   if (isSinglePost) {
-      if (!postData) return null
-    const {post} = postData
-    userPic = post.user.profile_image_url
-    username = post.user.username
-    postId = post.id
-    userId = post.user.id
-
+    if (!postData) return null;
+    const { post } = postData;
+    userPic = post.user.profile_image_url;
+    username = post.user.username;
+    postId = post.id;
+    userId = post.user.id;
   }
 
   Modal.setAppElement("#root");
@@ -109,7 +107,7 @@ const PostHeader = (props) => {
         style={customStyles}
         contentLabel="Example Modal"
       >
-        <ModalPost closeModal={closeModal} postId={postId} userId={userId}/>
+        <ModalPost closeModal={closeModal} postId={postId} userId={userId} />
       </Modal>
     </PostHeaderWrapper>
   );

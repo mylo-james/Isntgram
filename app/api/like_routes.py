@@ -1,15 +1,12 @@
 from flask import Blueprint, request, jsonify
 from sqlalchemy.orm import joinedload
-from ..models import db
-from ..models.users import User
-from ..models.likes import Like
-from ..auth import require_auth
+from ..models import db, User, Like
 
 
-bp = Blueprint("like", __name__, url_prefix="/api/like")
+like_routes = Blueprint("like", __name__)
 
 
-@bp.route('/<likeableType>/<id>')
+@like_routes.route('/<likeableType>/<id>')
 def getLikes(likeableType, id):
     likes = Like.query.filter(
         Like.likeable_id == id).filter(Like.likeable_type == likeableType).all()
@@ -21,7 +18,7 @@ def getLikes(likeableType, id):
     return {"users": likesList}
 
 
-@bp.route('', methods=["POST"])
+@like_routes.route('', methods=["POST"])
 def post_like():
     data = request.json
     print(data)
@@ -33,7 +30,7 @@ def post_like():
 
     return user.to_dict()
 
-@bp.route('', methods=["DELETE"])
+@like_routes.route('', methods=["DELETE"])
 def delete_like():
     data = request.json
     print(data)

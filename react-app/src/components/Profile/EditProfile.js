@@ -2,10 +2,10 @@ import { useContext, useState, useEffect } from "react";
 import styled from "styled-components";
 import { backendURL } from "../../config";
 import { Redirect } from "react-router-dom";
-import { UserContext, ProfileContext } from "../../context";
+import { UserContext, ProfileContext } from "../../Contexts";
 import Nav from "../Nav";
 import { toast } from "react-toastify";
-import ProfilePicModal from './ProfilePicModal'
+import ProfilePicModal from "./ProfilePicModal";
 
 const EditProfileWrapper = styled.div`
   display: flex;
@@ -108,10 +108,10 @@ const EditProfileWrapper = styled.div`
   }
 
   .goback-button {
-      color: #0095f6;
-      background-color: white;
-      margin-top: 20px;
-      border: 1px solid #0095f6;
+    color: #0095f6;
+    background-color: white;
+    margin-top: 20px;
+    border: 1px solid #0095f6;
   }
 `;
 
@@ -122,10 +122,7 @@ const EditProfile = (props) => {
   const [bio, setBio] = useState("");
   const [isEditProfilePicOpen, setIsEditProfilePicOpen] = useState(false);
 
-  const {
-    currentUserId,
-    currentUserProfilePic,
-  } = useContext(UserContext);
+  const { currentUserId, currentUserProfilePic } = useContext(UserContext);
 
   const { profileData } = useContext(ProfileContext);
 
@@ -134,8 +131,8 @@ const EditProfile = (props) => {
   };
 
   const changeProfilePic = () => {
-      setIsEditProfilePicOpen(true)
-  }
+    setIsEditProfilePicOpen(true);
+  };
 
   useEffect(() => {
     if (!profileData) return;
@@ -188,26 +185,25 @@ const EditProfile = (props) => {
     });
 
     if (!res.ok) {
-        const {error} = await res.json()
-            toast.error(error, {
-            autoClose: 3000,
-            closeOnClick: true,
-          });
+      const { error } = await res.json();
+      toast.error(error, {
+        autoClose: 3000,
+        closeOnClick: true,
+      });
     } else {
-        const { access_token } = await res.json()
-        localStorage.setItem("Isntgram_access_token", access_token)
-        toast.info('Successfully updated!',{
-            autoClose: 3000,
-            closeOnClick: true,
-          })
-        props.history.push(`/profile/${currentUserId}`);
+      const { access_token } = await res.json();
+      localStorage.setItem("Isntgram_access_token", access_token);
+      toast.info("Successfully updated!", {
+        autoClose: 3000,
+        closeOnClick: true,
+      });
+      props.history.push(`/profile/${currentUserId}`);
     }
-
   };
 
   const goBack = (e) => {
-      props.history.push(`/profile/${currentUserId}`);
-  }
+    props.history.push(`/profile/${currentUserId}`);
+  };
   return (
     <>
       <Nav />
@@ -257,23 +253,20 @@ const EditProfile = (props) => {
           />
 
           <label htmlFor="email">Email</label>
-          <input
-            value={email}
-            id="email"
-            name="email"
-            onChange={updateState}
-          />
+          <input value={email} id="email" name="email" onChange={updateState} />
           <button type="submit">Submit</button>
         </form>
-          <button className='goback-button' onClick={goBack}>Go back</button>
-          {isEditProfilePicOpen ? (
-            <ProfilePicModal
-              openModal={isEditProfilePicOpen}
-              closeModal={closeEditPicModal}
-            />
-          ) : (
-            ""
-          )}
+        <button className="goback-button" onClick={goBack}>
+          Go back
+        </button>
+        {isEditProfilePicOpen ? (
+          <ProfilePicModal
+            openModal={isEditProfilePicOpen}
+            closeModal={closeEditPicModal}
+          />
+        ) : (
+          ""
+        )}
       </EditProfileWrapper>
     </>
   );

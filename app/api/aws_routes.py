@@ -1,18 +1,17 @@
 import os
 import boto3
 import time
-from flask import Blueprint, request
-from ..models import db
-from ..models.users import User
-from ..models.posts import Post
+from flask import Blueprint, request, jsonify
+from ..models import db, User, Post
 
-bp = Blueprint("aws", __name__, url_prefix="/api/aws")
+
+aws_routes = Blueprint("aws", __name__)
 
 UPLOAD_FOLDER = 'uploads'
 BUCKET = 'isntgramaa'
 
 
-@bp.route('/<id>', methods=["POST"])
+@aws_routes.route('/<id>', methods=["POST"])
 def upload(id):
     if request.method == "POST":
         print('here')
@@ -25,7 +24,7 @@ def upload(id):
         return {"img": f'https://isntgramaa.s3.us-east-2.amazonaws.com/{f.filename}'}
 
 
-@bp.route('/post/<current_user_id>/<content>', methods=["POST"])
+@aws_routes.route('/post/<current_user_id>/<content>', methods=["POST"])
 def upload_post(current_user_id, content):
     print('am I even here?')
     f = request.files['file']

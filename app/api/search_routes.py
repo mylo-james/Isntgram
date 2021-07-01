@@ -1,18 +1,11 @@
 from flask import Blueprint, request
-from sqlalchemy.orm import joinedload
-from urllib import parse
-from ..models import db
-from ..models.posts import Post
-from ..models.users import User
-from ..models.follows import Follow
-from ..models.likes import Like
-from ..models.comments import Comment
-from ..auth import require_auth
-
-bp = Blueprint("query", __name__)
+from ..models import User
 
 
-@bp.route('')
+search_routes = Blueprint("query", __name__)
+
+
+@search_routes.route('')
 def query():
     query = request.args.get('query')
     print(query)

@@ -1,9 +1,7 @@
-import { useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Switch, BrowserRouter } from "react-router-dom";
 import { ProtectedRoute, AuthRoute } from "./Routes";
-import { UserContext, ProfileContext, PostContext } from "./context";
 import Home from "./Pages/Home";
 import Profile from "./Pages/Profile";
 import Explore from "./components/Explore/Explore";
@@ -14,39 +12,17 @@ import EditProfile from "./components/Profile/EditProfile";
 
 import SinglePost from "./Pages/SinglePost";
 import Upload from "./components/Upload/Upload";
+import {
+  UserContextProvider,
+  PostContextProvider,
+  ProfileContextProvider,
+} from "./Contexts";
 
 function App() {
-  const [currentUserId, setCurrentUserId] = useState("");
-  const [currentUserProfilePic, setCurrentUserProfilePic] = useState("");
-  const [currentUserFollowingCount, setCurrentUserFollowingCount] = useState(
-    null
-  );
-  const [currentUserFollowerCount, setCurrentUserFollowerCount] = useState(
-    null
-  );
-
-  const [profileData, setProfileData] = useState(null);
-
-  const [postData, setPostData] = useState(null);
-
-  const userContextValue = {
-    currentUserId,
-    setCurrentUserId,
-    currentUserProfilePic,
-    setCurrentUserProfilePic,
-    currentUserFollowerCount,
-    setCurrentUserFollowerCount,
-    currentUserFollowingCount,
-    setCurrentUserFollowingCount,
-  };
-
-  const profileContextValue = { profileData, setProfileData };
-  const postContextValue = { postData, setPostData };
-
   return (
-    <UserContext.Provider value={userContextValue}>
-      <ProfileContext.Provider value={profileContextValue}>
-        <PostContext.Provider value={postContextValue}>
+    <UserContextProvider>
+      <ProfileContextProvider>
+        <PostContextProvider>
           <ToastContainer autoClose={3000} limit={3} />
           <GlobalStyle />
           <BrowserRouter>
@@ -62,9 +38,9 @@ function App() {
               <ProtectedRoute path="/post/:id" component={SinglePost} />
             </Switch>
           </BrowserRouter>
-        </PostContext.Provider>
-      </ProfileContext.Provider>
-    </UserContext.Provider>
+        </PostContextProvider>
+      </ProfileContextProvider>
+    </UserContextProvider>
   );
 }
 

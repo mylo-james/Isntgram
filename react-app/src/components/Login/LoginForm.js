@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import styled from "styled-components";
 import { withRouter } from "react-router-dom";
-import { UserContext } from "../../context";
+import { UserContext } from "../../Contexts";
 import { backendURL } from "../../config";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -58,27 +58,17 @@ const LoginFormWrapper = styled.div`
 `;
 
 const LoginForm = (props) => {
-  const {
-    setCurrentUserId,
-    setCurrentUserFollowerCount,
-    setCurrentUserFollowingCount,
-    setCurrentUserProfilePic,
-  } = useContext(UserContext);
+  const currentUser = useContext(UserContext);
 
-  const [username, setUsername] = useState("");
+  const [errors, setErrors] = useState([]);
+  const [formData, setFormData] = useState({});
   const [password, setPassword] = useState("");
-
-  const updateState = (e) => {
-    if (e.target.getAttribute("name") === "username") {
-      setUsername(e.target.value);
-    } else setPassword(e.target.value);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = { username, password };
 
-    const res = await fetch(`${backendURL}/session`, {
+    const res = await fetch(`${backendURL}/auth`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -145,7 +135,9 @@ const LoginForm = (props) => {
           placeholder="Username"
           name="username"
           id="username"
-          onChange={updateState}
+          onChange={(e) =>
+            setFormData({ ...formData, username: e.target.value })
+          }
         />
 
         <label style={{ display: "none" }} htmlFor="password">
@@ -157,7 +149,7 @@ const LoginForm = (props) => {
           placeholder="Password"
           name="password"
           id="password"
-          onChange={updateState}
+          onChange={setFormData({ ...formData, password: e.target.value })}
         />
 
         <button style={{ cursor: "pointer" }} type="submit">

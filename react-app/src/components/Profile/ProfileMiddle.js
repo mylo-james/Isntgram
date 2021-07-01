@@ -1,9 +1,8 @@
-import { useState, useContext} from "react";
+import { useState, useContext } from "react";
 import styled from "styled-components";
 import DynamicModal from "../DynamicModal";
 import Modal from "react-modal";
-import {ProfileContext} from '../../context'
-
+import { ProfileContext } from "../../Contexts";
 
 const ProfileMiddleDataWrapper = styled.section`
   display: flex;
@@ -21,8 +20,8 @@ const ProfileMiddleDataWrapper = styled.section`
   }
 
   .profile-data__type {
-      font-size: 14px;
-      color: #aaa;
+    font-size: 14px;
+    color: #aaa;
   }
   @media screen and (min-width: 735px) {
     border-top: none;
@@ -40,10 +39,9 @@ const ProfileMiddleDataWrapper = styled.section`
   }
 `;
 
-
 const ProfileMiddle = (props) => {
-  const {profileData} = useContext(ProfileContext)
-  const {num_posts: numPosts} = profileData
+  const { profileData } = useContext(ProfileContext);
+  const { num_posts: numPosts } = profileData;
 
   const [isFollowersOpen, setIsFollowersOpen] = useState(false);
   const [isFollowingOpen, setIsFollowingOpen] = useState(false);
@@ -85,7 +83,9 @@ const ProfileMiddle = (props) => {
           onClick={() => setIsFollowersOpen(true)}
           className="profile-middle__data"
         >
-          <div className="profile-data__number">{profileData.followersList.length}</div>
+          <div className="profile-data__number">
+            {profileData.followersList.length}
+          </div>
           <div className="profile-data__type">followers</div>
         </div>
         <div
@@ -93,7 +93,9 @@ const ProfileMiddle = (props) => {
           onClick={() => setIsFollowingOpen(true)}
           className="profile-middle__data"
         >
-          <div className="profile-data__number">{profileData.followingList.length}</div>
+          <div className="profile-data__number">
+            {profileData.followingList.length}
+          </div>
           <div className="profile-data__type">following</div>
         </div>
       </ProfileMiddleDataWrapper>
@@ -103,7 +105,7 @@ const ProfileMiddle = (props) => {
         style={customStyles}
         contentLabel="Example Modal"
       >
-        <DynamicModal closeModal={closeFollowersModal} title={"Followers"}/>
+        <DynamicModal closeModal={closeFollowersModal} title={"Followers"} />
       </Modal>
       <Modal
         isOpen={isFollowingOpen}
@@ -111,7 +113,7 @@ const ProfileMiddle = (props) => {
         style={customStyles}
         contentLabel="Example Modal"
       >
-        <DynamicModal closeModal={closeFollowingModal} title={"Following"}/>
+        <DynamicModal closeModal={closeFollowingModal} title={"Following"} />
       </Modal>
     </>
   );

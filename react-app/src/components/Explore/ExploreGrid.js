@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import styled from "styled-components";
 import InfiniteScroll from "react-infinite-scroller";
 import { backendURL } from "../../config";
-import { UserContext } from "../../context";
+import { UserContext } from "../../Contexts";
 
 import Loading from "../Loading/Loading";
 import Layout1 from "./Layout1";

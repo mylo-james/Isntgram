@@ -1,15 +1,12 @@
 from flask import Blueprint, request
-from sqlalchemy.orm import joinedload
-from ..models import db
-from ..config import Configuration
+from ..models import db, User
+from ..config import Config
 
-from ..models.users import User
-from ..auth import require_auth
 import jwt
 
-bp = Blueprint("users", __name__, url_prefix="/api/user")
+user_routes = Blueprint("users", __name__)
 
-@bp.route('', methods=['PUT'])
+@user_routes.route('', methods=['PUT'])
 def update_user():
     data = request.json
     user = User.query.filter(User.id == data["id"]).first()
@@ -36,11 +33,11 @@ def update_user():
     if len(old_keys.intersection(new_keys)) == 6:
         return {"error": "No changes made"}, 401
 
-    access_token = jwt.encode({'email': user.email}, Configuration.SECRET_KEY, algorithm="HS256")
+    access_token = jwt.encode({'email': user.email}, Config.SECRET_KEY, algorithm="HS256")
     return {'access_token': access_token.decode('UTF-8'), 'user': user.to_dict()}
 
 
-@bp.route('/<id>/resetImg')
+@user_routes.route('/<id>/resetImg')
 def resetImg(id):
     user = User.query.filter(User.id == id).first()
 

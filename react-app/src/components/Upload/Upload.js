@@ -1,9 +1,9 @@
-import { useState, useContext, useRef} from "react";
-import styled from "styled-components"
-import {UserContext} from '../../context'
-import {backendURL} from '../../config'
-import {fadeIn} from '../../Styles/animations'
-import {RiImageAddLine} from "react-icons/ri"
+import { useState, useContext, useRef } from "react";
+import styled from "styled-components";
+import { UserContext } from "../../Contexts";
+import { backendURL } from "../../config";
+import { fadeIn } from "../../Styles/animations";
+import { RiImageAddLine } from "react-icons/ri";
 import { toast } from "react-toastify";
 
 const UploadWrapper = styled.div`
@@ -31,12 +31,11 @@ const UploadWrapper = styled.div`
     color: #262626;
   }
 
-  .imageWrapper{
+  .imageWrapper {
     height: 80vw;
     max-height: 380px;
     width: 80vw;
     max-width: 380px;
-
   }
 
   .labelWrapper {
@@ -89,12 +88,10 @@ const UploadWrapper = styled.div`
   }
 
   button:hover {
-      background-color: #545972;
-      color: white;
-      border: none;
-
+    background-color: #545972;
+    color: white;
+    border: none;
   }
-
 
   .imageWrapper {
     display: flex;
@@ -103,7 +100,6 @@ const UploadWrapper = styled.div`
     height: 400px;
     width: 100%;
     margin-bottom: 20px;
-
   }
 
   .fileUploader {
@@ -127,93 +123,87 @@ const UploadWrapper = styled.div`
   }
 
   @media screen and (min-width: 500px) {
-  margin: 74px auto;
-  border: 1px solid #dfdfdf;
-  width: 500px;
-  border-radius: 3px;
+    margin: 74px auto;
+    border: 1px solid #dfdfdf;
+    width: 500px;
+    border-radius: 3px;
   }
 
-.custom-file-input {
-  color: transparent;
-  width: 100%;
-  height: 30px;
-  margin-top: 20px;
-}
-.custom-file-input::-webkit-file-upload-button {
-  visibility: hidden;
-}
-.custom-file-input::before {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  .custom-file-input {
+    color: transparent;
+    width: 100%;
+    height: 30px;
+    margin-top: 20px;
+  }
+  .custom-file-input::-webkit-file-upload-button {
+    visibility: hidden;
+  }
+  .custom-file-input::before {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-  content: 'Select Photo';
-  color: white;
-  height: 30px;
-  background: #0095f6;
-  border-radius: 5px;
-  outline: none;
-  white-space: nowrap;
-  cursor: pointer;
-  font-weight: 700;
-}
-.custom-file-input:hover::before {
-  border-color: black;
-}
-.custom-file-input:active {
-  outline: 0;
-}
-.custom-file-input:active::before {
-  background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9);
-}
-
+    content: "Select Photo";
+    color: white;
+    height: 30px;
+    background: #0095f6;
+    border-radius: 5px;
+    outline: none;
+    white-space: nowrap;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .custom-file-input:hover::before {
+    border-color: black;
+  }
+  .custom-file-input:active {
+    outline: 0;
+  }
+  .custom-file-input:active::before {
+    background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9);
+  }
 `;
 
-
 const Upload = (props) => {
-  const {currentUserId} = useContext(UserContext)
+  const { currentUserId } = useContext(UserContext);
   const [picture, setPicture] = useState(null);
-  const [imagePreview, setImagePreview] = useState()
+  const [imagePreview, setImagePreview] = useState();
   const captionInput = useRef();
-
 
   const onDrop = (e) => {
     setPicture(e.target.files[0]);
-    setImagePreview(URL.createObjectURL(e.target.files[0]))
+    setImagePreview(URL.createObjectURL(e.target.files[0]));
   };
 
   const goBack = (e) => {
     props.history.push(`/`);
   };
 
-  const handleUpload = async () =>{
+  const handleUpload = async () => {
+    const formData = new FormData();
+    formData.append("file", picture);
 
-    const formData = new FormData()
-    formData.append('file', picture)
+    const caption = encodeURIComponent(captionInput.current.value) || "null";
 
-    const caption = encodeURIComponent(captionInput.current.value) || "null"
-    
-    const res = await fetch(`${backendURL}/aws/post/${currentUserId}/${caption}`, {
-      method: "POST",
-      body: formData
-    })
+    const res = await fetch(
+      `${backendURL}/aws/post/${currentUserId}/${caption}`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
 
     if (!res.ok) {
-      toast.error('Upload Error. Please try again!')
+      toast.error("Upload Error. Please try again!");
     } else {
-      const post = await res.json()
-      toast.info('Upload Success!')
-      props.history.push(`/post/${post.id}`)
-
+      const post = await res.json();
+      toast.info("Upload Success!");
+      props.history.push(`/post/${post.id}`);
     }
-
-
-
-
-  }
+  };
 
   return (
-    <UploadWrapper >
+    <UploadWrapper>
       <div className="imageWrapper">
         {!picture ? (
           <div className="labelWrapper">
@@ -226,12 +216,24 @@ const Upload = (props) => {
       </div>
       {picture ? (
         <>
-          <label htmlFor='caption'>Add a Caption:</label>
-          <textarea ref={captionInput} id="caption" placeholder="Tell us about your photo..." />
-          <button style={{marginBottom: "6px"}} onClick={handleUpload}>Upload</button>
+          <label htmlFor="caption">Add a Caption:</label>
+          <textarea
+            ref={captionInput}
+            id="caption"
+            placeholder="Tell us about your photo..."
+          />
+          <button style={{ marginBottom: "6px" }} onClick={handleUpload}>
+            Upload
+          </button>
         </>
       ) : null}
-      <input className="custom-file-input" type='file' multiple={false} accept='.jpg, .gif, .png, .gif' onChange={onDrop}/>
+      <input
+        className="custom-file-input"
+        type="file"
+        multiple={false}
+        accept=".jpg, .gif, .png, .gif"
+        onChange={onDrop}
+      />
 
       <button className="goback-button" onClick={goBack}>
         Go back
