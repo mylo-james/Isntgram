@@ -49,7 +49,7 @@ app.register_blueprint(search_routes,url_prefix='/api/search')
 app.register_blueprint(aws_routes,url_prefix='/api/aws')
 
 #Security
-CORS(app)
+# CORS(app)
 
 @app.before_request
 def https_redirect():

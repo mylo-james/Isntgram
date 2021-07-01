@@ -36,7 +36,7 @@ const LoginCardWrapper = styled.div`
   }
 `;
 
-const LoginCard = (props) => {
+const LoginCard = () => {
   return (
     <LoginCardWrapper>
       <img className="navImage" src={navImage} alt="logo" />

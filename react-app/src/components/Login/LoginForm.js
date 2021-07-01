@@ -1,171 +1,146 @@
-import { useState, useContext } from "react";
-import styled from "styled-components";
-import { withRouter } from "react-router-dom";
-import { UserContext } from "../../Contexts";
-import { backendURL } from "../../config";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { useState, useContext } from 'react';
+import styled from 'styled-components';
+import { useHistory, withRouter } from 'react-router-dom';
+import { UserContext } from '../../Contexts';
+
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginFormWrapper = styled.div`
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  flex-direction: column;
-  margin-top: 15%;
-  height: 50vh;
-  width: 100%;
-
-  * {
-    width: 80%;
-    font-size: 0.9rem;
-    text-align: center;
-  }
-
-  .form-wrapper {
     display: flex;
-    height: 70%;
-    flex-flow: column;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: center;
-  }
+    flex-direction: column;
+    margin-top: 15%;
+    height: 50vh;
+    width: 100%;
 
-  input {
-    padding: 0 5px;
-    height: 32px;
-    border: #dfdfdf 1px solid;
-    border-radius: 5px;
+    * {
+        width: 80%;
+        font-size: 0.9rem;
+        text-align: center;
+    }
 
-    text-align: left;
-  }
+    .form-wrapper {
+        display: flex;
+        height: 70%;
+        flex-flow: column;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-  button {
-    background-color: #0095f6;
-    border: none;
-    border-radius: 5px;
-    height: 30px;
-    color: white;
-    font-weight: 700;
-  }
+    input {
+        padding: 0 5px;
+        height: 32px;
+        border: #dfdfdf 1px solid;
+        border-radius: 5px;
 
-  a {
-    color: #0095f6;
-    font-weight: 700;
-  }
+        text-align: left;
+    }
 
-  a:hover {
-    color: blue;
-  }
+    button {
+        background-color: #0095f6;
+        border: none;
+        border-radius: 5px;
+        height: 30px;
+        color: white;
+        font-weight: 700;
+    }
+
+    a {
+        color: #0095f6;
+        font-weight: 700;
+    }
+
+    a:hover {
+        color: blue;
+    }
 `;
 
-const LoginForm = (props) => {
-  const currentUser = useContext(UserContext);
+const LoginForm = () => {
+    const { setCurrentUser } = useContext(UserContext);
+    let history = useHistory();
 
-  const [errors, setErrors] = useState([]);
-  const [formData, setFormData] = useState({});
-  const [password, setPassword] = useState("");
+    const [formData, setFormData] = useState({ username: '', password: '' });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const data = { username, password };
+    const handleSubmit = async (e, data = formData) => {
+        e.preventDefault();
 
-    const res = await fetch(`${backendURL}/auth`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+        const res = await fetch(`/api/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
 
-    if (res.status !== 200) {
-      const { error } = await res.json();
-      toast.info(error, {
-        position: "top-right",
-        autoClose: 5000,
-        closeOnClick: true,
-      });
-    } else {
-      const { user, access_token } = await res.json();
-      localStorage.setItem("Isntgram_access_token", access_token);
-      setCurrentUserId(user.id);
-      setCurrentUserProfilePic(user.profile_image_url);
-      setCurrentUserFollowerCount(user.numFollowers);
-      setCurrentUserFollowingCount(user.numFollowing);
-      props.history.push("/");
-    }
-  };
+        if (res.status !== 200) {
+            const { errors } = await res.json();
+            errors.forEach((error) => {
+                toast.info(error, {
+                    position: 'top-right',
+                    autoClose: 5000,
+                    closeOnClick: true,
+                });
+            });
+        } else {
+            const user = await res.json();
+            setCurrentUser(user);
+            history.push('/');
+        }
+    };
 
-  const demoLogin = async (e) => {
-    e.preventDefault();
-    const data = { username: "DemoUser", password: "Test@1234" };
+    const demoLogin = (e) => {
+        e.preventDefault();
+        handleSubmit(e, { username: 'DemoUser', password: 'Test@1234' });
+    };
 
-    const res = await fetch(`${backendURL}/session`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+    return (
+        <LoginFormWrapper>
+            <form onSubmit={handleSubmit} className='form-wrapper'>
+                <label style={{ display: 'none' }} htmlFor='username'>
+                    Username
+                </label>
 
-    if (res.status !== 200) {
-      const { error } = await res.json();
-      toast.info(error, {
-        position: "top-right",
-        autoClose: 5000,
-        closeOnClick: true,
-      });
-    } else {
-      const { user, access_token } = await res.json();
-      localStorage.setItem("Isntgram_access_token", access_token);
-      setCurrentUserId(user.id);
-      setCurrentUserProfilePic(user.profile_image_url);
-      setCurrentUserFollowerCount(user.numFollowers);
-      setCurrentUserFollowingCount(user.numFollowing);
-      props.history.push("/");
-    }
-  };
+                <input
+                    placeholder='Username'
+                    name='username'
+                    id='username'
+                    value={formData.username}
+                    onChange={(e) =>
+                        setFormData({ ...formData, username: e.target.value })
+                    }
+                />
 
-  return (
-    <LoginFormWrapper>
-      <form onSubmit={handleSubmit} className="form-wrapper">
-        <label style={{ display: "none" }} htmlFor="username">
-          Username
-        </label>
+                <label style={{ display: 'none' }} htmlFor='password'>
+                    Password
+                </label>
 
-        <input
-          placeholder="Username"
-          name="username"
-          id="username"
-          onChange={(e) =>
-            setFormData({ ...formData, username: e.target.value })
-          }
-        />
+                <input
+                    type='password'
+                    placeholder='Password'
+                    name='password'
+                    id='password'
+                    value={formData.password}
+                    onChange={(e) =>
+                        setFormData({ ...formData, password: e.target.value })
+                    }
+                />
 
-        <label style={{ display: "none" }} htmlFor="password">
-          Password
-        </label>
+                <button style={{ cursor: 'pointer' }} type='submit'>
+                    Log In
+                </button>
+                <button style={{ cursor: 'pointer' }} onClick={demoLogin}>
+                    Try Our Demo
+                </button>
 
-        <input
-          type="password"
-          placeholder="Password"
-          name="password"
-          id="password"
-          onChange={setFormData({ ...formData, password: e.target.value })}
-        />
-
-        <button style={{ cursor: "pointer" }} type="submit">
-          Log In
-        </button>
-        <button style={{ cursor: "pointer" }} onClick={demoLogin}>
-          Try Our Demo
-        </button>
-
-        <div>
-          Don't have an account?
-          <a href="/auth/register"> Sign up</a>
-        </div>
-      </form>
-    </LoginFormWrapper>
-  );
+                <div>
+                    Don't have an account?
+                    <a href='/auth/register'> Sign up</a>
+                </div>
+            </form>
+        </LoginFormWrapper>
+    );
 };
 
 export default withRouter(LoginForm);

@@ -1,4 +1,14 @@
-export const backendURL =
-  process.env.NODE_ENV === "production" ? "https://isntgram.herokuapp.com/api" : `http://localhost:5000/api`;
-export const frontendURL =
-  process.env.NODE_ENV === "production" ? "https://isntgram.herokuapp.com" : "http://localhost:3000";
+import { toast } from "react-toastify";
+
+export const backendURL = '/api';
+export const frontendURL = '/';
+
+export function showErrors(errors) {
+    errors.forEach((error) => {
+        toast.info(error, {
+            position: 'top-right',
+            autoClose: 5000,
+            closeOnClick: true,
+        });
+    });
+}
