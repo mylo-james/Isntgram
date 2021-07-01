@@ -7,7 +7,7 @@ from ..models.users import User
 from ..auth import require_auth
 import jwt
 
-bp = Blueprint("users", __name__, url_prefix="/api/user")
+bp = Blueprint("users", __name__)
 
 @bp.route('', methods=['PUT'])
 def update_user():

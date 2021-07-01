@@ -1,12 +1,12 @@
 import os
 import boto3
 import time
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 from ..models import db
 from ..models.users import User
 from ..models.posts import Post
 
-bp = Blueprint("aws", __name__, url_prefix="/api/aws")
+bp = Blueprint("aws", __name__)
 
 UPLOAD_FOLDER = 'uploads'
 BUCKET = 'isntgramaa'

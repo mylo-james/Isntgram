@@ -8,7 +8,7 @@ from ..auth import require_auth
 #  following = /:id/following
 #  follows = /:id
 
-bp = Blueprint("follow", __name__, url_prefix="/api/follow")
+bp = Blueprint("follow", __name__)
 
 # users who follow user of <id>
 @bp.route('/<id>')

@@ -2,8 +2,9 @@ from ..models import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
 from sqlalchemy.orm import validates
+from flask_login import UserMixin
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -46,7 +47,7 @@ class User(db.Model):
 
     @property
     def password(self):
-        return hashed_password
+        return self.hashed_password
 
     @password.setter
     def password(self, password):

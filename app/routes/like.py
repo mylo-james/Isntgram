@@ -6,7 +6,7 @@ from ..models.likes import Like
 from ..auth import require_auth
 
 
-bp = Blueprint("like", __name__, url_prefix="/api/like")
+bp = Blueprint("like", __name__)
 
 
 @bp.route('/<likeableType>/<id>')

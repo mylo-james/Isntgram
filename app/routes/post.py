@@ -10,7 +10,7 @@ from ..models.comments import Comment
 from ..auth import require_auth
 from random import randint
 
-bp = Blueprint("posts", __name__, url_prefix="/api/post")
+bp = Blueprint("posts", __name__)
 
 
 @bp.route('/scroll/<length>')

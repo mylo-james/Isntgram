@@ -8,7 +8,7 @@ from ..models.likes import Like
 from ..models.comments import Comment
 from ..auth import require_auth
 
-bp = Blueprint("profile", __name__, url_prefix="/api/profile")
+bp = Blueprint("profile", __name__)
 
 
 @bp.route('/<id>')

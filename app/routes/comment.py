@@ -4,7 +4,7 @@ from ..models.comments import Comment
 from ..models.users import User
 from ..models.likes import Like
 
-bp = Blueprint("comment", __name__, url_prefix="/api/comment")
+bp = Blueprint("comment", __name__)
 
 
 @bp.route('', methods=["POST"])

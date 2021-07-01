@@ -9,7 +9,7 @@ from ..models.likes import Like
 from ..models.comments import Comment
 from ..auth import require_auth
 
-bp = Blueprint("query", __name__, url_prefix="/api/search")
+bp = Blueprint("query", __name__)
 
 
 @bp.route('')

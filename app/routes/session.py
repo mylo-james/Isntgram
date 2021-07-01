@@ -7,8 +7,9 @@ from app.models.users import User
 from app.models.follows import Follow
 from ..config import Configuration
 from ..auth import require_auth
+from flask_login import current_user, login_user, logout_user, login_required
 
-bp = Blueprint("session", __name__, url_prefix='/api/session')
+bp = Blueprint("session", __name__)
 
 def checkPassword(password):
     if len(password) < 8:
@@ -26,45 +27,36 @@ def checkPassword(password):
 @bp.route('', methods=["POST"])
 def login():
     data = request.json
-    if not data['username']:
-        return {"error": "Please provide a Username"}, 401
-    if not data['password']:
-        return{ "error": "Please provide a Password"}, 401
     user = User.query.filter(User.username == data['username']).first()
-    if not user:
-        return {"error": "Username not found"}, 422
-    num_following = Follow.query.filter(Follow.user_id == user.id).count()
-    num_followers = Follow.query.filter(
-        Follow.user_followed_id == user.id).count()
-    user_dict = user.to_dict()
-    user_dict['numFollowing'] = num_following
-    user_dict['numFollowers'] = num_followers
+    login_user(user)
+    return {"user": user.to_dict()}
+    # data = request.json
+    # if not data['username']:
+    #     return {"error": "Please provide a Username"}, 401
+    # if not data['password']:
+    #     return{ "error": "Please provide a Password"}, 401
+    # user = User.query.filter(User.username == data['username']).first()
+    # if not user:
+    #     return {"error": "Username not found"}, 422
+    # num_following = Follow.query.filter(Follow.user_id == user.id).count()
+    # num_followers = Follow.query.filter(
+    #     Follow.user_followed_id == user.id).count()
+    # user_dict = user.to_dict()
+    # user_dict['numFollowing'] = num_following
+    # user_dict['numFollowers'] = num_followers
 
-    if user.check_password(data['password']):
-        access_token = jwt.encode(
-            {'email': user.email}, Configuration.SECRET_KEY, algorithm="HS256")
-        print(access_token, "!!!!!!!!!!!!!!!!!!")
-        return {'access_token': access_token, 'user': user.to_dict()}
-    else:
-        return {"error": "Incorrect password"}, 401
+    # if user.check_password(data['password']):
+    #     access_token = jwt.encode(
+    #         {'email': user.email}, Configuration.SECRET_KEY, algorithm="HS256")
+    #     print(access_token, "!!!!!!!!!!!!!!!!!!")
+    #     return {'access_token': access_token, 'user': user.to_dict()}
+    # else:
+    #     return {"error": "Incorrect password"}, 401
 
 @bp.route('/check', methods=["POST"])
 def check():
-    data=request.json
-    print(data)
-    # try:
-    decoded = jwt.decode(data['access_token'], Configuration.SECRET_KEY, algorithms="HS256")
-    print(decoded, "!!!!!!!!!!")
-
-    user = User.query.filter(
-        User.email == decoded.get('email')).first()
-    following_arr = Follow.query.filter(Follow.user_id == user.id).all()
-    followers_arr = Follow.query.filter(Follow.user_followed_id == user.id).all()
-    user_dict = user.to_dict()
-    user_dict['numFollowing'] = len(following_arr)
-    user_dict['numFollowers'] = len(followers_arr)
-
-    return {'user': user_dict}
+    if current_user.is_authenticated:
+       return current_user.to_dict()
     # except:
     #     return {'error': 'invalid auth token'}, 401
 

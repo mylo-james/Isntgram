@@ -8,7 +8,7 @@ from ..models.likes import Like
 from ..models.comments import Comment
 from ..auth import require_auth
 
-bp = Blueprint("notification", __name__, url_prefix="/api/note")
+bp = Blueprint("notification", __name__)
 
 
 @bp.route('/<id>/scroll/<length>')
