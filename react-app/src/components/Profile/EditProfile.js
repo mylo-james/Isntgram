@@ -176,7 +176,7 @@ const EditProfile = (props) => {
         e.preventDefault();
         const data = { id: currentUserId, username, email, full_name, bio };
 
-        const res = await fetch(`${backendURL}/user`, {
+        const res = await fetch(`/api/user`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

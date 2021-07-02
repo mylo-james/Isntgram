@@ -111,7 +111,7 @@ const ExploreGrid = (props) => {
             const len = toRender.length;
             try {
                 const res = await fetch(
-                    `${backendURL}/post/scroll/${len * 3}`,
+                    `/api/post/scroll/${len * 3}`,
                     {
                         Authorization: localStorage.getItem(
                             'Isntgram_access_token'

@@ -46,7 +46,7 @@ const FollowNotification = (props) => {
     const followUser = async () => {
         const body = { userId: currentUserId, userFollowedId: props.user.id };
         try {
-            const res = await fetch(`${backendURL}/follow`, {
+            const res = await fetch(`/api/follow`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ const FollowNotification = (props) => {
     const unfollowUser = async () => {
         const body = { userId: currentUserId, userFollowedId: props.user.id };
         try {
-            const res = await fetch(`${backendURL}/follow`, {
+            const res = await fetch(`/api/follow`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

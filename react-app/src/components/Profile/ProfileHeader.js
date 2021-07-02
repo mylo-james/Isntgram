@@ -164,7 +164,7 @@ const ProfileHeader = (props) => {
         (async () => {
             try {
                 const res = await fetch(
-                    `${backendURL}/follow/${currentUserId}/following`
+                    /api/follow/${currentUserId}/following`
                 );
 
                 if (!res.ok) throw res;
@@ -223,7 +223,7 @@ const ProfileHeader = (props) => {
         e.preventDefault();
         const body = { userId: currentUserId, userFollowedId: profileId };
         try {
-            const res = await fetch(`${backendURL}/follow`, {
+            const res = await fetch(`/api/follow`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -249,7 +249,7 @@ const ProfileHeader = (props) => {
         e.preventDefault();
         const body = { userId: currentUserId, userFollowedId: profileId };
         try {
-            const res = await fetch(`${backendURL}/follow`, {
+            const res = await fetch(`/api/follow`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

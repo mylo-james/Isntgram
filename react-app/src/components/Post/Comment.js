@@ -68,7 +68,7 @@ const Comment = ({ username, content, userId, id }) => {
             id,
         };
         try {
-            const res = await fetch(`${backendURL}/like`, {
+            const res = await fetch(`/api/like`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -82,8 +82,6 @@ const Comment = ({ username, content, userId, id }) => {
             setLikes(newLikes);
 
             toast.info('Unliked comment!', { autoClose: 1500 });
-
-            
         } catch (e) {
             console.error(e);
         }

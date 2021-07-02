@@ -60,7 +60,7 @@ const Notifications = () => {
         (async () => {
             try {
                 const res = await fetch(
-                    `${backendURL}/profile/${currentUserId}`
+                    `/api/profile/${currentUserId}`
                 );
 
                 if (!res.ok) throw res;
@@ -79,7 +79,7 @@ const Notifications = () => {
         (async () => {
             try {
                 const res = await fetch(
-                    `${backendURL}/note/${currentUserId}/scroll/${toRender.length}`
+                    `/api/note/${currentUserId}/scroll/${toRender.length}`
                 );
 
                 if (!res.ok) throw res;

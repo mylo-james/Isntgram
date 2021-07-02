@@ -2,7 +2,6 @@ import { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { UserContext, ProfileContext } from '../Contexts';
-import { backendURL } from '../config';
 const ModalWrapper = styled.div`
     width: 260px;
     max-height: 400px;
@@ -88,9 +87,7 @@ const DynamicModal = (props) => {
         if (!currentUserId) return;
         (async () => {
             try {
-                const res = await fetch(
-                    `$/follow/${currentUserId}/following`
-                );
+                const res = await fetch(`$/follow/${currentUserId}/following`);
 
                 if (!res.ok) throw res;
 
@@ -121,7 +118,7 @@ const DynamicModal = (props) => {
         if (!endpoint) return;
         (async () => {
             try {
-                const res = await fetch(`${backendURL}/${endpoint}`);
+                const res = await fetch(`/api/${endpoint}`);
 
                 if (!res.ok) throw res;
 
@@ -137,7 +134,7 @@ const DynamicModal = (props) => {
         e.preventDefault();
         const body = { userId: currentUserId, userFollowedId };
         try {
-            const res = await fetch(`${backendURL}/follow`, {
+            const res = await fetch(`/api/follow`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -171,7 +168,7 @@ const DynamicModal = (props) => {
         e.preventDefault();
         const body = { userId: currentUserId, userFollowedId };
         try {
-            const res = await fetch(`${backendURL}/follow`, {
+            const res = await fetch(`/api/follow`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

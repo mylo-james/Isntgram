@@ -21,7 +21,7 @@ const ExploreGridScratch = () => {
   const loadMore = async () => {
     if (hasMore === false) return;
     const res = await fetch(
-      `${backendURL}/post/scroll/${toRender.length * 3}`,
+      /api/post/scroll/${toRender.length * 3}`,
       {
         Authorization: localStorage.getItem("Isntgram_access_token"),
       }
@@ -54,7 +54,7 @@ const ExploreGridScratch = () => {
   }, []);
 
   const loadInit = async () => {
-    const res = await fetch(`${backendURL}/post/scroll/init`, {
+    const res = await fetch(`/api/post/scroll/init`, {
       Authorization: localStorage.getItem("Isntgram_access_token"),
     });
 
