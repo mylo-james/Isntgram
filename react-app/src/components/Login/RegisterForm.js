@@ -91,9 +91,7 @@ const RegisterForm = () => {
             console.log(errors);
             showErrors(errors);
         } else {
-            const user = await res.json();
-            setCurrentUser(user);
-            history.push('/');
+            window.location.reload(false);
         }
     };
 
