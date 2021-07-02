@@ -1,9 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { frontendURL } from '../../config';
 
 const ModalStyle = styled.div`
     width: 80vw;
@@ -44,6 +43,7 @@ const ModalStyle = styled.div`
 
 const ModalPost = (props) => {
     const { postId, closeModal } = props;
+    const location = useLocation();
     return (
         <ModalStyle>
             {window.location.href.includes('/post/') ? (
@@ -53,10 +53,7 @@ const ModalPost = (props) => {
                     Go To Post
                 </Link>
             )}
-            <CopyToClipboard
-                style={{ cursor: 'pointer' }}
-                text={`${frontendURL}/post/${postId}`}
-            >
+            <CopyToClipboard style={{ cursor: 'pointer' }} text={location}>
                 <button
                     onClick={() => {
                         toast.info('Copied to clipboard!');
