@@ -164,7 +164,7 @@ const ProfileHeader = (props) => {
         (async () => {
             try {
                 const res = await fetch(
-                    /api/follow/${currentUserId}/following`
+                    `/api/follow/${currentUserId}/following`
                 );
 
                 if (!res.ok) throw res;

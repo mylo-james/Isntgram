@@ -186,7 +186,7 @@ const Upload = (props) => {
     const caption = encodeURIComponent(captionInput.current.value) || "null";
 
     const res = await fetch(
-      /api/aws/post/${currentUserId}/${caption}`,
+      `/api/aws/post/${currentUserId}/${caption}`,
       {
         method: "POST",
         body: formData,
