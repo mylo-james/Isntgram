@@ -88,7 +88,7 @@ function App() {
                         {/* <ProtectedRoute path="/direct/inbox" component={Home} /> */}
                         <ProtectedRoute
                             exact
-                            path='/profile/:id'
+                            path='/profile/:userId'
                             component={Profile}
                         />
                         <ProtectedRoute path='/explore' component={Explore} />

@@ -50,18 +50,16 @@ const NotificationsWrapper = styled.div`
 `;
 
 const Notifications = () => {
-    const { currentUserId } = useContext(UserContext);
+    const { currentUser } = useContext(UserContext);
     const { profileData, setProfileData } = useContext(ProfileContext);
     const [toRender, setToRender] = useState([]);
     const [hasMore, setHasMore] = useState(true);
 
     useEffect(() => {
-        if (!currentUserId) return;
+        if (!currentUser.id) return;
         (async () => {
             try {
-                const res = await fetch(
-                    `/api/profile/${currentUserId}`
-                );
+                const res = await fetch(`/api/profile/${currentUser.id}`);
 
                 if (!res.ok) throw res;
 
@@ -72,21 +70,21 @@ const Notifications = () => {
                 console.error(e);
             }
         })();
-    }, [currentUserId, setProfileData]);
+    }, [currentUser.id, setProfileData]);
 
     const loadMore = () => {
-        if (!currentUserId) return;
+        if (!currentUser.id) return;
         (async () => {
             try {
                 const res = await fetch(
-                    `/api/note/${currentUserId}/scroll/${toRender.length}`
+                    `/api/note/${currentUser.id}/scroll/${toRender.length}`
                 );
 
                 if (!res.ok) throw res;
 
-                const { notifications } = await res.json();
-
-                const nodeList = notifications.map((notification, i) => {
+                const { notes } = await res.json();
+                console.log(notes);
+                const nodeList = notes.map((notification, i) => {
                     switch (notification.type) {
                         case 'comment':
                             return (
@@ -127,7 +125,7 @@ const Notifications = () => {
 
                 setToRender([...toRender, ...nodeList]);
 
-                if (notifications.length < 20) {
+                if (notes.length < 20) {
                     setHasMore(false);
                 }
             } catch (e) {

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
+import { UserContext } from '../../Contexts';
 import { fadeIn } from '../../Styles/animations';
 
 const CommentNotificationWrapper = styled.div`
@@ -17,6 +18,8 @@ const CommentNotificationWrapper = styled.div`
 `;
 
 const CommentNotification = (props) => {
+    let { currentUser } = useContext(UserContext);
+
     return (
         <CommentNotificationWrapper style={props.style}>
             <>
@@ -29,7 +32,9 @@ const CommentNotification = (props) => {
                 </a>
                 <p>
                     <a href={`/profile/${props.user.id}`}>
-                        {props.user.username}{' '}
+                        {props.user.username === currentUser.username
+                            ? 'You'
+                            : props.user.username}{' '}
                     </a>
                     commented on your
                     <a href={`/post/${props.post.id}`}> post</a>

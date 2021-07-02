@@ -46,7 +46,7 @@ const ExploreGridWrapper = styled.div`
 `;
 
 const ExploreGrid = (props) => {
-    const { currentUserId } = useContext(UserContext);
+    const { currentUser } = useContext(UserContext);
 
     const [toRender, setToRender] = useState([]);
     const [hasMore, setHasMore] = useState(true);
@@ -105,18 +105,14 @@ const ExploreGrid = (props) => {
     }
 
     const fetchMore = () => {
-        if (!currentUserId) return;
+        if (!currentUser.id) return;
 
         (async () => {
             const len = toRender.length;
             try {
                 const res = await fetch(
                     `/api/post/scroll/${len * 3}`,
-                    {
-                        Authorization: localStorage.getItem(
-                            'Isntgram_access_token'
-                        ),
-                    }
+    
                 );
                 const obj = await res.json();
 
@@ -136,7 +132,7 @@ const ExploreGrid = (props) => {
         })();
     };
 
-    if (!toRender || !currentUserId) return null;
+    if (!toRender || !currentUser.id) return null;
     return (
         <ExploreGridWrapper key='gridWrapper'>
             <InfiniteScroll

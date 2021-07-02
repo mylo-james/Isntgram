@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
+import { UserContext } from '../../Contexts';
 import { fadeIn } from '../../Styles/animations';
 
 const LikeNotificationWrapper = styled.div`
@@ -17,6 +18,7 @@ const LikeNotificationWrapper = styled.div`
 `;
 
 const LikeNotification = (props) => {
+    let { currentUser } = useContext(UserContext);
     return (
         <LikeNotificationWrapper style={props.style}>
             <>
@@ -29,7 +31,9 @@ const LikeNotification = (props) => {
                 </a>
                 <p>
                     <a href={`/profile/${props.user.id}`}>
-                        {props.user.username}{' '}
+                        {props.user.username === currentUser.username
+                            ? 'You'
+                            : props.user.username}{' '}
                     </a>{' '}
                     liked your
                     <a href={`/post/${props.post.id}`}> {props.type}</a>

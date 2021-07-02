@@ -2,8 +2,7 @@ import { useContext } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { RiHeartLine } from 'react-icons/ri';
-import { LikeContext, UserContext } from '../../Contexts';
-import { backendURL } from '../../config';
+import { LikeContext, PostsContext, UserContext } from '../../Contexts';
 import { toast } from 'react-toastify';
 
 const CommentWrapper = styled.div`
@@ -32,18 +31,20 @@ const CommentWrapper = styled.div`
     }
 `;
 
-const Comment = ({ username, content, userId, id }) => {
-    const { currentUserId } = useContext(UserContext);
+const Comment = ({ username, content, postId, userId, id }) => {
+    const { currentUser } = useContext(UserContext);
     const { likes, setLikes } = useContext(LikeContext);
+    const { posts, setPosts } = useContext(PostsContext);
+    console.log(id);
 
     const likeComment = async () => {
         const body = {
-            userId: currentUserId,
+            userId: currentUser.id,
             likeableType: 'comment',
             id,
         };
         try {
-            const res = await fetch(`api/like`, {
+            const res = await fetch(`/api/like`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -62,24 +63,31 @@ const Comment = ({ username, content, userId, id }) => {
     };
 
     const unlikeComment = async () => {
-        const body = {
-            userId: currentUserId,
-            likeableType: 'comment',
-            id,
-        };
+        const like = likes[`comment-${id}`];
         try {
             const res = await fetch(`/api/like`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(body),
+                body: JSON.stringify(like),
             });
 
             if (!res.ok) throw res;
             let newLikes = { ...likes };
-            newLikes.delete(`comment-${id}`);
+            delete newLikes[`comment-${id}`];
             setLikes(newLikes);
+
+            setPosts((posts) => {
+                let newPost = { ...posts[postId] };
+                let filtered = newPost.likes.filter(
+                    (ele) => ele.id !== like.id
+                );
+                return {
+                    ...posts,
+                    [postId]: { ...posts[postId], likes: filtered },
+                };
+            });
 
             toast.info('Unliked comment!', { autoClose: 1500 });
         } catch (e) {

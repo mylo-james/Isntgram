@@ -122,7 +122,7 @@ const EditProfile = (props) => {
     const [bio, setBio] = useState('');
     const [isEditProfilePicOpen, setIsEditProfilePicOpen] = useState(false);
 
-    const { currentUserId, currentUserProfilePic } = useContext(UserContext);
+    const { currentUser } = useContext(UserContext);
 
     const { profileData } = useContext(ProfileContext);
 
@@ -143,10 +143,10 @@ const EditProfile = (props) => {
         setBio(user.bio);
     }, [profileData]);
 
-    if (!currentUserId) return null;
+    if (!currentUser.id) return null;
 
     if (!profileData) {
-        return <Redirect to={`/profile/${currentUserId}`} />;
+        return <Redirect to={`/profile/${currentUser.id}`} />;
     }
 
     const updateState = (e) => {
@@ -174,7 +174,7 @@ const EditProfile = (props) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const data = { id: currentUserId, username, email, full_name, bio };
+        const data = { id: currentUser.id, username, email, full_name, bio };
 
         const res = await fetch(`/api/user`, {
             method: 'PUT',
@@ -197,12 +197,12 @@ const EditProfile = (props) => {
                 autoClose: 3000,
                 closeOnClick: true,
             });
-            props.history.push(`/profile/${currentUserId}`);
+            props.history.push(`/profile/${currentUser.id}`);
         }
     };
 
     const goBack = (e) => {
-        props.history.push(`/profile/${currentUserId}`);
+        props.history.push(`/profile/${currentUser.id}`);
     };
     return (
         <>
@@ -212,7 +212,7 @@ const EditProfile = (props) => {
                     <img
                         onClick={changeProfilePic}
                         className='editProfile__picture'
-                        src={currentUserProfilePic}
+                        src={currentUser.profile_image_url}
                         alt='profile-pic'
                     />
                     <div className='editProfile__user-details'>

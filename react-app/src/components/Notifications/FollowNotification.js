@@ -29,7 +29,7 @@ const FollowNotificationWrapper = styled.div`
 `;
 
 const FollowNotification = (props) => {
-    const { currentUserId } = useContext(UserContext);
+    const { currentUser } = useContext(UserContext);
     const { profileData, setProfileData } = useContext(ProfileContext);
     const [followingList, setFollowingList] = useState([]);
 
@@ -44,7 +44,7 @@ const FollowNotification = (props) => {
     }, [profileData, setFollowingList]);
 
     const followUser = async () => {
-        const body = { userId: currentUserId, userFollowedId: props.user.id };
+        const body = { userId: currentUser.id, userFollowedId: props.user.id };
         try {
             const res = await fetch(`/api/follow`, {
                 method: 'POST',
@@ -69,7 +69,7 @@ const FollowNotification = (props) => {
     };
 
     const unfollowUser = async () => {
-        const body = { userId: currentUserId, userFollowedId: props.user.id };
+        const body = { userId: currentUser.id, userFollowedId: props.user.id };
         try {
             const res = await fetch(`/api/follow`, {
                 method: 'DELETE',

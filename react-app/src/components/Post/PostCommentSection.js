@@ -46,8 +46,6 @@ const PostCommentSection = ({
     likes,
     caption,
 }) => {
-    
-
     function timeSince(timeStamp) {
         timeStamp = new Date(timeStamp);
         const now = new Date();
@@ -90,6 +88,7 @@ const PostCommentSection = ({
                                 id={id}
                                 userId={userId}
                                 username={username}
+                                postId={postId}
                                 // likesCommentList={likes_comment}
                                 content={content}
                             ></Comment>
@@ -108,22 +107,20 @@ const PostCommentSection = ({
 
             {isSinglePost
                 ? ''
-                : comments.map((comment) => {
-                      const {
-                          id,
-                          user: { id: user_id, username },
-                          content,
-                      } = comment;
-                      return (
-                          <Comment
-                              key={`post-comment-${id}`}
-                              commentId={id}
-                              userId={user_id}
-                              username={username}
-                              content={content}
-                          ></Comment>
-                      );
-                  })}
+                : comments.map(
+                      ({ id, user: { id: userId, username }, content }) => {
+                          return (
+                              <Comment
+                                  key={`post-comment-${id}`}
+                                  id={id}
+                                  userId={userId}
+                                  postId={postId}
+                                  username={username}
+                                  content={content}
+                              ></Comment>
+                          );
+                      }
+                  )}
             <div className='post-date-created'>{`${timeSince(
                 created_at
             )}`}</div>

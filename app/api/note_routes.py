@@ -27,17 +27,18 @@ def index(id, length):
         follows_list.append(follows_dict)
 
 
-    comment_likes = Like.query.filter(Like.likeable_id.in_(user_comment_ids)).filter(Like.likeable_type == "comment").order_by(Like.created_at.desc()).all()
-    post_likes = Like.query.filter(Like.likeable_id.in_(user_post_ids)).filter(Like.likeable_type == "post").order_by(Like.created_at.desc()).all()
-  
-    all_likes_list = comment_likes + post_likes
-
+    all_likes_list = Like.query.filter(Like.likeable_id.in_(user_comment_ids)).order_by(Like.created_at.desc()).all()
+    
     for like in all_likes_list:
         like_dict = like.to_dict()
         user = like.user.to_dict()
-        post = Post.query.filter(Post.id == like.likeable_id).first().to_dict()
+        print("!!!!!!!!!!!!!!", like_dict['likeable_id'])
+        if like_dict['likeable_type'] == 'post':
+            post = Post.query.filter(Post.id == like_dict['likeable_id']).first()
+        else:
+            post = Post.query.filter(Comment.id == like_dict['likeable_id']).first()
         like_dict['user'] = user
-        like_dict['post'] = post
+        like_dict['post'] = post.to_dict()
         like_dict['type'] = "like"
         likes_list.append(like_dict)
 

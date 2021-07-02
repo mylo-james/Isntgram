@@ -78,16 +78,16 @@ const DynamicModal = (props) => {
     const [currentUserFollows, setCurrentUserFollows] = useState([]);
     const [endpoint, setEndpoint] = useState('');
 
-    const { currentUserId } = useContext(UserContext);
+    const { currentUser } = useContext(UserContext);
     const { profileData, setProfileData } = useContext(ProfileContext);
     const {
         user: { id },
     } = profileData;
     useEffect(() => {
-        if (!currentUserId) return;
+        if (!currentUser.id) return;
         (async () => {
             try {
-                const res = await fetch(`$/follow/${currentUserId}/following`);
+                const res = await fetch(`$/follow/${currentUser.id}/following`);
 
                 if (!res.ok) throw res;
 
@@ -98,7 +98,7 @@ const DynamicModal = (props) => {
                 console.error(e);
             }
         })();
-    }, [currentUserId]);
+    }, [currentUser.id]);
 
     useEffect(() => {
         let url;
@@ -132,7 +132,7 @@ const DynamicModal = (props) => {
 
     const followUser = async (e, userFollowedId) => {
         e.preventDefault();
-        const body = { userId: currentUserId, userFollowedId };
+        const body = { userId: currentUser.id, userFollowedId };
         try {
             const res = await fetch(`/api/follow`, {
                 method: 'POST',
@@ -149,7 +149,7 @@ const DynamicModal = (props) => {
 
             setCurrentUserFollows([...currentUserFollows, id]);
 
-            if (profileData.user.id === currentUserId) {
+            if (profileData.user.id === currentUser.id) {
                 const updatedFollowingList = [
                     ...profileData.followingList,
                     response,
@@ -166,7 +166,7 @@ const DynamicModal = (props) => {
 
     const unfollowUser = async (e, userFollowedId) => {
         e.preventDefault();
-        const body = { userId: currentUserId, userFollowedId };
+        const body = { userId: currentUser.id, userFollowedId };
         try {
             const res = await fetch(`/api/follow`, {
                 method: 'DELETE',
@@ -186,7 +186,7 @@ const DynamicModal = (props) => {
 
             setCurrentUserFollows(currentUserFollowsCopy);
 
-            if (profileData.user.id === currentUserId) {
+            if (profileData.user.id === currentUser.id) {
                 const updatedFollowingList = profileData.followingList.filter(
                     (user) => user.user_followed_id !== id
                 );
@@ -238,7 +238,7 @@ const DynamicModal = (props) => {
                                 </div>
                             </div>
                         </div>
-                        {currentUserId === id ? (
+                        {currentUser.id === id ? (
                             ''
                         ) : currentUserFollows.includes(id) ? (
                             <button

@@ -5,7 +5,7 @@ import ProfileMiddle from '../components/Profile/ProfileMiddle';
 import ProfilePosts from '../components/Profile/ProfilePosts';
 import { ProfileContext, UserContext } from '../Contexts';
 import LoadingPage from '../components/Loading/LoadingPage';
-import { backendURL } from '../config';
+import { useParams } from 'react-router-dom';
 
 const ProfileWrapper = styled.div`
     padding-top: 55px;
@@ -26,15 +26,8 @@ const ProfileWrapper = styled.div`
 const Profile = (props) => {
     const [windowSize, setWindowSize] = useState(window.innerWidth);
     const { profileData, setProfileData } = useContext(ProfileContext);
-    const { currentUserId } = useContext(UserContext);
-
-    const [userId, setUserId] = useState(null);
-
-    useEffect(() => {
-        let url = props.location.pathname.split('/');
-        const userId = url[url.length - 1];
-        setUserId(userId);
-    }, [props.location.pathname]);
+    const { currentUser } = useContext(UserContext);
+    const { userId } = useParams();
 
     useEffect(() => {
         window.addEventListener('resize', () => {
@@ -58,12 +51,9 @@ const Profile = (props) => {
         })();
     }, [userId, setProfileData]);
 
-    if (!profileData || !currentUserId) return null;
+    if (!profileData || !currentUser.id) return null;
 
-    if (
-        profileData.user.id !==
-        parseInt(props.location.pathname.match(/(\d+)$/)[0])
-    )
+    if (profileData.user.id !== Number(userId))
         return <LoadingPage style={{ animationDuration: '1s' }} />;
     return (
         <ProfileWrapper>

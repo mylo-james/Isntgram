@@ -3,7 +3,6 @@ import Modal from 'react-modal';
 import { ProfileContext, UserContext } from '../../Contexts';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
-import { backendURL } from '../../config';
 
 Modal.setAppElement('#root');
 
@@ -68,7 +67,7 @@ const ProfilePicModal = (props) => {
     const { openModal, closeModal } = props;
 
     const { profileData, setProfileData } = useContext(ProfileContext);
-    const { currentUserId, setCurrentUserProfilePic } = useContext(UserContext);
+    const { currentUser, setCurrentUser } = useContext(UserContext);
     const changePhoto = (e) => {
         const file = e.currentTarget.files[0];
         let formData;
@@ -83,7 +82,7 @@ const ProfilePicModal = (props) => {
     const postImage = async (formData) => {
         if (!formData) return;
         try {
-            const res = await fetch(`/api/aws/${currentUserId}`, {
+            const res = await fetch(`/api/aws/${currentUser.id}`, {
                 method: 'POST',
                 body: formData,
             });
@@ -101,7 +100,7 @@ const ProfilePicModal = (props) => {
             setProfileData(newProfileData);
             toast.info('Photo upload Success!');
             closeModal();
-            setCurrentUserProfilePic(img);
+            setCurrentUser((user) => ({ ...user, profile_image_url: img }));
         } catch (e) {
             console.error(e);
         }
@@ -126,7 +125,7 @@ const ProfilePicModal = (props) => {
 
     const removeProfilePic = async () => {
         try {
-            const res = await fetch(`/api/user/${currentUserId}/resetImg`);
+            const res = await fetch(`/api/user/${currentUser.id}/resetImg`);
 
             if (!res.ok) throw res;
 

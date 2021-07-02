@@ -137,7 +137,7 @@ Modal.setAppElement('#root');
 
 const ProfileHeader = (props) => {
     const { windowSize } = props;
-    const { currentUserId } = useContext(UserContext);
+    const { currentUser } = useContext(UserContext);
 
     // modals
     const [isFollowersOpen, setIsFollowersOpen] = useState(false);
@@ -164,7 +164,7 @@ const ProfileHeader = (props) => {
         (async () => {
             try {
                 const res = await fetch(
-                    `/api/follow/${currentUserId}/following`
+                    `/api/follow/${currentUser.id}/following`
                 );
 
                 if (!res.ok) throw res;
@@ -180,7 +180,7 @@ const ProfileHeader = (props) => {
                 console.error(e);
             }
         })();
-    }, [profileData, currentUserId]);
+    }, [profileData, currentUser.id]);
 
     const closeEditPicModal = () => {
         setIsEditProfilePicOpen(false);
@@ -221,7 +221,7 @@ const ProfileHeader = (props) => {
 
     const followUser = async (e) => {
         e.preventDefault();
-        const body = { userId: currentUserId, userFollowedId: profileId };
+        const body = { userId: currentUser.id, userFollowedId: profileId };
         try {
             const res = await fetch(`/api/follow`, {
                 method: 'POST',
@@ -247,7 +247,7 @@ const ProfileHeader = (props) => {
 
     const unfollowUser = async (e) => {
         e.preventDefault();
-        const body = { userId: currentUserId, userFollowedId: profileId };
+        const body = { userId: currentUser.id, userFollowedId: profileId };
         try {
             const res = await fetch(`/api/follow`, {
                 method: 'DELETE',
@@ -286,13 +286,15 @@ const ProfileHeader = (props) => {
                         <ButtonWrapper
                             style={{ cursor: 'default' }}
                             onClick={
-                                currentUserId === profileId ? changeProfImg : ''
+                                currentUser.id === profileId
+                                    ? changeProfImg
+                                    : ''
                             }
                         >
                             <img
                                 style={{
                                     cursor:
-                                        currentUserId === profileId
+                                        currentUser.id === profileId
                                             ? 'pointer'
                                             : 'default',
                                 }}
@@ -314,13 +316,13 @@ const ProfileHeader = (props) => {
                             <div className='profile-details__username'>
                                 {username}
                             </div>
-                            {currentUserId === profileId ? (
+                            {currentUser.id === profileId ? (
                                 <RiLogoutBoxRLine onClick={logOut} />
                             ) : (
                                 ''
                             )}
                         </div>
-                        {currentUserId === profileId ? (
+                        {currentUser.id === profileId ? (
                             <Link to='/accounts/edit'>
                                 <button>Edit Profile</button>
                             </Link>
@@ -350,13 +352,13 @@ const ProfileHeader = (props) => {
                 <ProfileHeaderBig>
                     <BigProfileImageWrapper
                         onClick={
-                            currentUserId === profileId ? changeProfImg : ''
+                            currentUser.id === profileId ? changeProfImg : ''
                         }
                     >
                         <img
                             style={{
                                 cursor:
-                                    currentUserId === profileId
+                                    currentUser.id === profileId
                                         ? 'pointer'
                                         : 'default',
                             }}
@@ -377,7 +379,7 @@ const ProfileHeader = (props) => {
                             <div className='big-profile__username'>
                                 {username}
                             </div>
-                            {currentUserId === profileId ? (
+                            {currentUser.id === profileId ? (
                                 <Link to='/accounts/edit'>
                                     <button className='big-profile__editProfile-button'>
                                         Edit Profile
@@ -403,7 +405,7 @@ const ProfileHeader = (props) => {
                                     Follow
                                 </button>
                             )}
-                            {currentUserId === profileId ? (
+                            {currentUser.id === profileId ? (
                                 <RiLogoutBoxRLine onClick={logOut} />
                             ) : (
                                 ''
