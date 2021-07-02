@@ -1,153 +1,117 @@
-import { useContext, useState } from "react";
-import styled from "styled-components";
-import { Link } from "react-router-dom";
-import { RiHeartLine } from "react-icons/ri";
-import { PostContext, UserContext } from "../../Contexts";
-import { backendURL } from "../../config";
-import { toast } from "react-toastify";
+import { useContext, useState } from 'react';
+import styled from 'styled-components';
+import { Link } from 'react-router-dom';
+import { RiHeartLine } from 'react-icons/ri';
+import { LikeContext, PostContext, UserContext } from '../../Contexts';
+import { backendURL } from '../../config';
+import { toast } from 'react-toastify';
 
 const CommentWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  padding: 5px 16px 0 0;
-  line-height: 18px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 5px 16px 0 0;
+    line-height: 18px;
 
-  .comment_username {
-    font-weight: bold;
-  }
+    .comment_username {
+        font-weight: bold;
+    }
 
-  @media screen and (min-width: 735px) {
-    padding: 5px 0 0 0;
-  }
+    @media screen and (min-width: 735px) {
+        padding: 5px 0 0 0;
+    }
 
-  .liked-comment {
-    cursor: pointer;
-    color: rgb(237, 73, 86);
-  }
+    .liked-comment {
+        cursor: pointer;
+        color: rgb(237, 73, 86);
+    }
 
-  .unliked-comment {
-    cursor: pointer;
-    color: #8e8e8e;
-  }
+    .unliked-comment {
+        cursor: pointer;
+        color: #8e8e8e;
+    }
 `;
 
-const Comment = ({
-  username,
-  likesCommentList,
-  content,
-  userId,
-  commentId,
-}) => {
-  const { postData, setPostData } = useContext(PostContext);
-  const { currentUserId } = useContext(UserContext);
-  const [likesCommentArr, setLikesCommentArr] = useState(likesCommentList);
+const Comment = ({ username, content, userId, id }) => {
+    const { currentUserId } = useContext(UserContext);
+    const { likes, setLikes } = useContext(LikeContext);
 
-  const likeComment = async () => {
-    const body = {
-      userId: currentUserId,
-      likeableType: "comment",
-      id: commentId,
+    const likeComment = async () => {
+        const body = {
+            userId: currentUserId,
+            likeableType: 'comment',
+            id,
+        };
+        try {
+            const res = await fetch(`api/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(body),
+            });
+
+            if (!res.ok) throw res;
+
+            const { like } = await res.json();
+            setLikes({ ...likes, [`comment-${id}`]: like });
+            toast.info('Liked comment!', { autoClose: 1500 });
+        } catch (e) {
+            console.error(e);
+        }
     };
-    try {
-      const res = await fetch(`${backendURL}/like`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
 
-      if (!res.ok) throw res;
+    const unlikeComment = async () => {
+        const body = {
+            userId: currentUserId,
+            likeableType: 'comment',
+            id,
+        };
+        try {
+            const res = await fetch(`${backendURL}/like`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(body),
+            });
 
-      const response = await res.json();
-      toast.info("Liked comment!", { autoClose: 1500 });
+            if (!res.ok) throw res;
+            let newLikes = { ...likes };
+            newLikes.delete(`comment-${id}`);
+            setLikes(newLikes);
 
-      const newLikes = [...likesCommentList, response];
-      setLikesCommentArr(newLikes);
+            toast.info('Unliked comment!', { autoClose: 1500 });
 
-      if (postData) {
-        const newComment = postData.comments.filter(
-          (comment, idx) => comment.id === commentId
-        );
-        if (newComment.length > 0) {
-          newComment[0].likes_comment = newLikes;
+            
+        } catch (e) {
+            console.error(e);
         }
-
-        const newPostData = { ...postData };
-
-        setPostData(newPostData);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const unlikeComment = async () => {
-    const body = {
-      userId: currentUserId,
-      likeableType: "comment",
-      id: commentId,
     };
-    try {
-      const res = await fetch(`${backendURL}/like`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
 
-      if (!res.ok) throw res;
-
-      toast.info("Unliked comment!", { autoClose: 1500 });
-
-      const updatedList = likesCommentArr.filter(
-        (user) => user.id !== currentUserId
-      );
-      setLikesCommentArr(updatedList);
-      if (postData) {
-        let commentIdx;
-        for (let i = 0; i < postData.comments.length; i++) {
-          if (postData.comments[i].id === commentId) {
-            commentIdx = i;
-            break;
-          }
-        }
-
-        if (postData.comments[commentIdx].length > 0) {
-          const newList = postData.comments[commentIdx].likes_comment.filter(
-            (user) => user.id !== currentUserId
-          );
-          const newPostData = { ...postData };
-
-          newPostData.comments[commentIdx].likes_comment = newList;
-          setPostData(newPostData);
-        }
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  if (!likesCommentList) return null;
-  return (
-    <CommentWrapper>
-      <div>
-        <Link className="comment_username" to={`/profile/${userId}`}>
-          {username}{" "}
-        </Link>
-        {content}
-      </div>
-      <div>
-        {likesCommentArr.some((user) => user.id === currentUserId) ? (
-          <RiHeartLine onClick={unlikeComment} className="liked-comment" />
-        ) : (
-          <RiHeartLine onClick={likeComment} className="unliked-comment" />
-        )}
-      </div>
-    </CommentWrapper>
-  );
+    return (
+        <CommentWrapper>
+            <div>
+                <Link className='comment_username' to={`/profile/${userId}`}>
+                    {username}{' '}
+                </Link>
+                {content}
+            </div>
+            <div>
+                {likes[`comment-${id}`] ? (
+                    <RiHeartLine
+                        onClick={unlikeComment}
+                        className='liked-comment'
+                    />
+                ) : (
+                    <RiHeartLine
+                        onClick={likeComment}
+                        className='unliked-comment'
+                    />
+                )}
+            </div>
+        </CommentWrapper>
+    );
 };
 
 export default Comment;

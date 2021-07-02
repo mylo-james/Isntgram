@@ -6,6 +6,8 @@ import {
     PostContextProvider,
     ProfileContextProvider,
     UserContextProvider,
+    LikeContextProvider,
+    FollowContextProvider,
 } from './Contexts';
 import GlobalStyle from './Styles/GlobalStyle';
 
@@ -14,9 +16,13 @@ ReactDOM.render(
         <UserContextProvider>
             <ProfileContextProvider>
                 <PostContextProvider>
-                    <ToastContainer autoClose={3000} limit={3} />
-                    <GlobalStyle />
-                    <App />
+                    <LikeContextProvider>
+                        <FollowContextProvider>
+                            <ToastContainer autoClose={3000} limit={3} />
+                            <GlobalStyle />
+                            <App />
+                        </FollowContextProvider>
+                    </LikeContextProvider>
                 </PostContextProvider>
             </ProfileContextProvider>
         </UserContextProvider>

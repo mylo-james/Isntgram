@@ -1,10 +1,9 @@
-import React from "react";
-import styled from "styled-components";
+import React from 'react';
+import styled from 'styled-components';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { Link} from 'react-router-dom';
-import {toast} from 'react-toastify'
-import {frontendURL} from '../../config'
-
+import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { frontendURL } from '../../config';
 
 const ModalStyle = styled.div`
     width: 80vw;
@@ -13,13 +12,13 @@ const ModalStyle = styled.div`
     display: flex;
     flex-direction: column;
 
-    .button-post{
+    .button-post {
         display: flex;
         justify-content: center;
         align-items: center;
         height: 48px;
         font-size: 16px;
-        color: #0095F6;
+        color: #0095f6;
         font-weight: bold;
         background: white;
         border: none;
@@ -27,40 +26,56 @@ const ModalStyle = styled.div`
         outline: none;
     }
 
-    #button-unfollow{
+    #button-unfollow {
         color: red;
         font-weight: 600;
     }
-    #button-cancel{
+    #button-cancel {
         border: none;
         color: #262626;
         cursor: pointer;
     }
 
-    button:active{
+    button:active {
         background: #dfdfdf;
         outline: none;
     }
-
-
-   `;
+`;
 
 const ModalPost = (props) => {
-    const { postId, closeModal } = props
+    const { postId, closeModal } = props;
     return (
-
         <ModalStyle>
-            {window.location.href.includes('/post/') ? '' :
-            <Link to={`/post/${postId}`} className='button-post'>Go To Post</Link> }
-            <CopyToClipboard style={{cursor: 'pointer'}} text={`${frontendURL}/post/${postId}`}>
-                <button  onClick={() => {
-                    toast.info('Copied to clipboard!')
-                    closeModal()
-                }} className='button-post'>Copy Link</button>
+            {window.location.href.includes('/post/') ? (
+                ''
+            ) : (
+                <Link to={`/post/${postId}`} className='button-post'>
+                    Go To Post
+                </Link>
+            )}
+            <CopyToClipboard
+                style={{ cursor: 'pointer' }}
+                text={`${frontendURL}/post/${postId}`}
+            >
+                <button
+                    onClick={() => {
+                        toast.info('Copied to clipboard!');
+                        closeModal();
+                    }}
+                    className='button-post'
+                >
+                    Copy Link
+                </button>
             </CopyToClipboard>
-            <button onClick={closeModal} id='button-cancel' className='button-post'>Cancel</button>
-        </ModalStyle >
-    )
-}
+            <button
+                onClick={closeModal}
+                id='button-cancel'
+                className='button-post'
+            >
+                Cancel
+            </button>
+        </ModalStyle>
+    );
+};
 
 export default ModalPost;

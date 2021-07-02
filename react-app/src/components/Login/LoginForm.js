@@ -2,9 +2,7 @@ import { useState, useContext } from 'react';
 import styled from 'styled-components';
 import { useHistory, withRouter } from 'react-router-dom';
 import { UserContext } from '../../Contexts';
-
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { showErrors } from '../../config';
 
 const LoginFormWrapper = styled.div`
     display: flex;
@@ -76,13 +74,7 @@ const LoginForm = () => {
 
         if (res.status !== 200) {
             const { errors } = await res.json();
-            errors.forEach((error) => {
-                toast.info(error, {
-                    position: 'top-right',
-                    autoClose: 5000,
-                    closeOnClick: true,
-                });
-            });
+            showErrors(errors);
         } else {
             const user = await res.json();
             setCurrentUser(user);

@@ -1,113 +1,124 @@
-import { useState, useContext } from "react";
-import InfiniteScroll from "react-infinite-scroller";
-import styled from "styled-components";
-import Post from "../components/Post/Post";
-import { backendURL } from "../config";
-import { UserContext } from "../Contexts";
-import NoFollows from "../components/NoFollows";
-import Loading from "../components/Loading/Loading";
+import { useState, useContext, useEffect, useCallback } from 'react';
+import InfiniteScroll from 'react-infinite-scroller';
+import styled from 'styled-components';
+import Post from '../components/Post/Post';
+import { FollowContext, LikeContext, UserContext } from '../Contexts';
+import NoFollows from '../components/NoFollows';
+import Loading from '../components/Loading/Loading';
+import { showErrors } from '../config';
 
 const Feed = styled.div`
-  display: flex;
-  flex-flow: column;
-  padding-top: 55px;
-  align-items: center;
-  justify-content: center;
-  padding-bottom: 53px;
+    display: flex;
+    flex-flow: column;
+    padding-top: 55px;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 53px;
 
-  @media screen and (min-width: 640px) {
-    padding-top: 75px;
-  }
+    @media screen and (min-width: 640px) {
+        padding-top: 75px;
+    }
 
-  @media screen and (min-width: 475px) {
-    padding-bottom: 0;
-  }
+    @media screen and (min-width: 475px) {
+        padding-bottom: 0;
+    }
 `;
 
 const LoadingWrapper = styled.div`
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
     }
-    to {
-      opacity: 1;
-    }
-  }
 
-  @keyframes fadeOut {
-    from {
-      opacity: 1;
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
+        }
     }
-    to {
-      opacity: 0;
-    }
-  }
 
-  z-index: 2;
-  position: fixed;
-  opacity: 1;
-  animation-name: fadeIn;
-  animation-duration: 0.5s;
-  animation-fill-mode: forwards;
+    z-index: 2;
+    position: fixed;
+    opacity: 1;
+    animation-name: fadeIn;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
 `;
 
 const Home = () => {
-  const { currentUserId, currentUserFollowingCount } = useContext(UserContext);
-  const [feedPosts, setFeedPosts] = useState([]);
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(true);
+    const { currentUser } = useContext(UserContext);
+    const { follows } = useContext(FollowContext);
 
-  const loadMore = () => {
-    if (!currentUserId) return;
+    const [feedPosts, setFeedPosts] = useState([]);
+    const [hasMore, setHasMore] = useState(true);
+    const [loading, setLoading] = useState(true);
 
-    (async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(
-          `${backendURL}/post/${currentUserId}/scroll/${feedPosts.length}`
-        );
+    const loadMore = () => {
+        if (!currentUser.id) return;
 
-        if (!res.ok) throw res;
+        (async () => {
+            setLoading(true);
+            try {
+                const res = await fetch(
+                    `/api/post/${currentUser.id}/scroll/${feedPosts.length}`
+                );
 
-        const { posts } = await res.json();
+                if (!res.ok) throw res;
 
-        const nodeList = posts.map((post) => {
-          return <Post key={`feedPost-${post.id}`} post={post} />;
-        });
+                const { posts } = await res.json();
 
-        setFeedPosts([...feedPosts, ...nodeList]);
+                const nodeList = posts.map((post) => {
+                    return <Post key={`feedPost-${post.id}`} post={post} />;
+                });
 
-        if (posts.length < 3) {
-          setHasMore(false);
-          setLoading(false);
-        }
+                setFeedPosts([...feedPosts, ...nodeList]);
 
-        setLoading(false);
-      } catch (e) {
-        console.error(e);
-      }
-    })();
-  };
+                if (posts.length < 3) {
+                    setHasMore(false);
+                    setLoading(false);
+                }
 
-  if (!feedPosts) return null;
-  return (
-    <>
-      <LoadingWrapper
-        style={{ animationName: `${loading ? "fadeIn" : "fadeOut"}` }}
-      >
-        <Loading />
-      </LoadingWrapper>
-      <Feed>
-        {currentUserFollowingCount !== 0 ? (
-          <InfiniteScroll pageStart={0} loadMore={loadMore} hasMore={hasMore}>
-            {feedPosts}
-          </InfiniteScroll>
-        ) : (
-          <NoFollows />
-        )}
-      </Feed>
-    </>
-  );
+                setLoading(false);
+            } catch (e) {
+                console.error(e);
+            }
+        })();
+    };
+
+    if (!feedPosts) return null;
+
+    return (
+        <>
+            {Object.values(follows).length ? (
+                <>
+                    <LoadingWrapper
+                        style={{
+                            animationName: `${loading ? 'fadeIn' : 'fadeOut'}`,
+                        }}
+                    >
+                        <Loading />
+                    </LoadingWrapper>
+                    <Feed>
+                        <InfiniteScroll
+                            pageStart={0}
+                            loadMore={loadMore}
+                            hasMore={hasMore}
+                        >
+                            {feedPosts}
+                        </InfiniteScroll>
+                    </Feed>
+                </>
+            ) : (
+                <NoFollows />
+            )}
+        </>
+    );
 };
 
 export default Home;

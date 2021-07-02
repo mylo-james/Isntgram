@@ -19,8 +19,8 @@ def update_user():
         if User.query.filter(User.email == data['email']).first():
             return {"error": 'Email already exists'}, 401
         user.email = data["email"]
-    if user.full_name != data["fullName"]:
-        user.full_name = data["fullName"]
+    if user.full_name != data["full_name"]:
+        user.full_name = data["full_name"]
     if user.bio != data["bio"]:
         user.bio = data["bio"]
     db.session.commit()

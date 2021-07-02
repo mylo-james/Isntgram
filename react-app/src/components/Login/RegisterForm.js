@@ -1,7 +1,5 @@
 import { useContext, useState } from 'react';
 import { UserContext } from '../../Contexts';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import styled from 'styled-components';
 import { useHistory, withRouter } from 'react-router-dom';
 import { showErrors } from '../../config';
@@ -63,13 +61,13 @@ const RegisterFormWrapper = styled.div`
 `;
 
 const RegisterForm = () => {
-    const { currentUser, setCurrentUser } = useContext(UserContext);
+    const { setCurrentUser } = useContext(UserContext);
     let history = useHistory();
 
     const [formData, setFormData] = useState({
         username: '',
         email: '',
-        fullName: '',
+        full_name: '',
         password: '',
         confirmPassword: '',
     });
@@ -125,16 +123,16 @@ const RegisterForm = () => {
                     value={formData.email}
                 />
 
-                <label style={{ display: 'none' }} htmlFor='fullName'>
+                <label style={{ display: 'none' }} htmlFor='full_name'>
                     Full Name
                 </label>
 
                 <input
-                    name='fullName'
-                    id='fullName'
+                    name='full_name'
+                    id='full_name'
                     placeholder='Full Name'
                     onChange={updateState}
-                    value={formData.fullName}
+                    value={formData.full_name}
                 />
 
                 <label style={{ display: 'none' }} htmlFor='password'>

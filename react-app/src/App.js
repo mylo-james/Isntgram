@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import { Switch, BrowserRouter } from 'react-router-dom';
 import { ProtectedRoute, AuthRoute } from './Routes';
@@ -10,11 +10,49 @@ import Notifications from './components/Notifications/Notifications';
 import EditProfile from './components/Profile/EditProfile';
 import SinglePost from './Pages/SinglePost';
 import Upload from './components/Upload/Upload';
-import { UserContext } from './Contexts';
+import { FollowContext, LikeContext, UserContext } from './Contexts';
+import { showErrors } from './config';
 
 function App() {
-    let { setCurrentUser } = useContext(UserContext);
+    let { currentUser, setCurrentUser } = useContext(UserContext);
+    let { setFollows } = useContext(FollowContext);
+    let { setLikes } = useContext(LikeContext);
     let [loaded, setLoaded] = useState(false);
+
+    let getFollows = useCallback(async () => {
+        if (!currentUser.id) return;
+        let res = await fetch(`/api/follow/${currentUser.id}`);
+        if (res.status !== 200) {
+            let { errors } = await res.json();
+            showErrors(errors);
+        } else {
+            let { users } = await res.json();
+            let followObj = users.reduce((followObj, user) => {
+                followObj[user.id] = user;
+                return followObj;
+            }, {});
+            setFollows(followObj);
+        }
+    }, [setFollows, currentUser.id]);
+
+    let getLikes = useCallback(async () => {
+        if (!currentUser.id) return;
+        let res = await fetch(`/api/like/user/${currentUser.id}`);
+        if (res.status !== 200) {
+            let { errors } = await res.json();
+            showErrors(errors);
+        } else {
+            let { likes } = await res.json();
+            let obj = likes.reduce((obj, like) => {
+                let { likeable_id, likeable_type } = like;
+                obj[`${likeable_type}-${likeable_id}`] = like;
+                return obj;
+            }, {});
+            setLikes(obj);
+            setLoaded(true);
+        }
+    }, [currentUser.id, setLikes]);
+
     useEffect(() => {
         (async () => {
             let res = await fetch(`/api/auth/`, {
@@ -26,9 +64,15 @@ function App() {
                 let user = await res.json();
                 setCurrentUser(user);
             }
-            setLoaded(true);
         })();
     }, [setCurrentUser]);
+
+    useEffect(() => {
+        (async () => {
+            await getFollows();
+            await getLikes();
+        })();
+    }, [currentUser, getFollows, getLikes]);
 
     return (
         <>
