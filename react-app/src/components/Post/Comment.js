@@ -1,8 +1,8 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { RiHeartLine } from 'react-icons/ri';
-import { LikeContext, PostContext, UserContext } from '../../Contexts';
+import { LikeContext, UserContext } from '../../Contexts';
 import { backendURL } from '../../config';
 import { toast } from 'react-toastify';
 

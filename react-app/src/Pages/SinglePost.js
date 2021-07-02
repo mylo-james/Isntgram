@@ -1,4 +1,4 @@
-import { useEffect, useContext, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import PostHeader from '../components/Post/PostHeader';
 import PhotoImagePost from '../components/Post/PhotoImagePost';

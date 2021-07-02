@@ -1,10 +1,9 @@
-import { useState, useRef, useContext } from 'react';
+import { useState, useRef } from 'react';
 import styled from 'styled-components';
 import ModalPost from './ModalPost';
 import Modal from 'react-modal';
 import { AiOutlineEllipsis } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
-import { PostContext } from '../../Contexts';
 
 const PostHeaderWrapper = styled.div`
   display: flex;

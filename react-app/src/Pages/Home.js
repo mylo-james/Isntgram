@@ -1,11 +1,11 @@
-import { useState, useContext, useEffect, useCallback } from 'react';
+import { useState, useContext } from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
 import styled from 'styled-components';
 import Post from '../components/Post/Post';
-import { FollowContext, LikeContext, UserContext } from '../Contexts';
+import { FollowContext, UserContext } from '../Contexts';
 import NoFollows from '../components/NoFollows';
 import Loading from '../components/Loading/Loading';
-import { showErrors } from '../config';
+
 
 const Feed = styled.div`
     display: flex;

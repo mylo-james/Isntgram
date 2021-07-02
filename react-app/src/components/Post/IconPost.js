@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import styled from 'styled-components';
 import { RiHeartLine } from 'react-icons/ri';
 import { FaRegComment } from 'react-icons/fa';

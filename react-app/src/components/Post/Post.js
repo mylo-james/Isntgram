@@ -1,11 +1,11 @@
-import { useState } from 'react';
+
 import styled from 'styled-components';
 import PostHeader from './PostHeader';
 import PhotoImagePost from './PhotoImagePost';
 import IconPost from './IconPost';
 import PostCommentSection from './PostCommentSection';
 import CommentInputField from './CommentInputField';
-import { useHistory } from 'react-router-dom';
+;
 
 const PostWrapper = styled.div`
     width: 100%;

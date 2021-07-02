@@ -1,11 +1,11 @@
-import { useContext } from 'react';
+
 // import DynamicModal from "../DynamicModal";
 import Modal from 'react-modal';
 import styled from 'styled-components';
 import Comment from './Comment';
 import Caption from './Caption';
 import { Link } from 'react-router-dom';
-import { PostContext } from '../../Contexts';
+
 
 const CommentWrapper = styled.div`
     padding: 0px 16px 16px;
