@@ -1,7 +1,6 @@
 import { useState, useContext, useRef } from 'react';
 import styled from 'styled-components';
 import { UserContext } from '../../Contexts';
-import { backendURL } from '../../config';
 import { fadeIn } from '../../Styles/animations';
 import { RiImageAddLine } from 'react-icons/ri';
 import { toast } from 'react-toastify';

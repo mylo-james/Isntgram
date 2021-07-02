@@ -1,6 +1,5 @@
 import { useContext, useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { backendURL } from '../../config';
 import { fadeIn } from '../../Styles/animations';
 import { UserContext, ProfileContext } from '../../Contexts';
 

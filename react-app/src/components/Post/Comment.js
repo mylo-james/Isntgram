@@ -34,7 +34,7 @@ const CommentWrapper = styled.div`
 const Comment = ({ username, content, postId, userId, id }) => {
     const { currentUser } = useContext(UserContext);
     const { likes, setLikes } = useContext(LikeContext);
-    const { posts, setPosts } = useContext(PostsContext);
+    const { setPosts } = useContext(PostsContext);
     console.log(id);
 
     const likeComment = async () => {

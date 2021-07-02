@@ -90,7 +90,7 @@ const NavProfilePic = styled.div`
 `;
 
 const Nav = () => {
-    const { currentUser, setCurrentUser } = useContext(UserContext);
+    const { currentUser } = useContext(UserContext);
     return (
         <>
             <NavContainer>

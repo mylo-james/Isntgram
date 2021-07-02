@@ -1,6 +1,5 @@
 import { useContext, useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { backendURL } from '../../config';
 import { Redirect } from 'react-router-dom';
 import { UserContext, ProfileContext } from '../../Contexts';
 import Nav from '../Nav';
