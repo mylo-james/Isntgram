@@ -81,9 +81,6 @@ def home_feed(id, length):
 def get_post(post_id):
 
     post = Post.query.filter(Post.id == post_id).first()
-    postLikes = Like.query.filter(
-        Like.likeable_type == "post", Like.likeable_id == post_id
-    )
 
     post_dict = post.to_dict()
 

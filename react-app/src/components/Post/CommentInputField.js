@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react';
 import styled from 'styled-components';
-import { UserContext, PostContext } from '../../Contexts';
+import { UserContext } from '../../Contexts';
 
 const CommentInputWrapper = styled.section`
     padding: 0 16px;
@@ -45,7 +45,6 @@ const CommentInputWrapper = styled.section`
 const CommentInputField = ({ id: postId, isSinglePost }) => {
     const [content, setContent] = useState('');
     const { currentUser } = useContext(UserContext);
-    const { setPostData, postData } = useContext(PostContext);
 
     const updateCommentState = (e) => {
         setContent(e.target.value);
@@ -63,9 +62,6 @@ const CommentInputField = ({ id: postId, isSinglePost }) => {
 
         if (!res.ok) throw res;
         const comment = await res.json();
-
-        const updatedComments = [...postData.comments, comment];
-        setPostData({ ...postData, comments: updatedComments });
 
         setContent('');
     };

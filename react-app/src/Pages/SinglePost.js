@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import PostHeader from '../components/Post/PostHeader';
 import PhotoImagePost from '../components/Post/PhotoImagePost';
@@ -6,6 +6,7 @@ import IconPost from '../components/Post/IconPost';
 import PostCommentSection from '../components/Post/PostCommentSection';
 import CommentInputField from '../components/Post/CommentInputField';
 import { useParams } from 'react-router-dom';
+import { PostsContext } from '../Contexts';
 
 const SinglePostWrapper = styled.div`
     width: 100%;
@@ -22,25 +23,29 @@ const SinglePostWrapper = styled.div`
 `;
 
 const SinglePost = (props) => {
-    let [post, setPost] = useState({});
+    let { posts, setPosts } = useContext(PostsContext);
+    let [load, setLoad] = useState(false);
     let { id } = useParams();
 
     useEffect(() => {
         (async () => {
+            setLoad(false);
             try {
                 const res = await fetch(`/api/post/${id}`);
 
                 if (!res.ok) throw res;
 
                 const { post } = await res.json();
-                setPost(post);
+                setPosts((posts) => ({ ...posts, [post.id]: post }));
+                setLoad(true);
             } catch (e) {
                 console.error(e);
             }
         })();
-    }, [id, setPost]);
+    }, [id, setPosts]);
 
-    if (!Object.keys(post).length) return null;
+    if (!load) return null;
+    let post = posts[id];
     console.log(post);
     return (
         <>

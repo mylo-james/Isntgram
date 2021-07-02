@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { ToastContainer } from 'react-toastify';
 import App from './App';
 import {
-    PostContextProvider,
+    PostsContextProvider,
     ProfileContextProvider,
     UserContextProvider,
     LikeContextProvider,
@@ -15,7 +15,7 @@ ReactDOM.render(
     <StrictMode>
         <UserContextProvider>
             <ProfileContextProvider>
-                <PostContextProvider>
+                <PostsContextProvider>
                     <LikeContextProvider>
                         <FollowContextProvider>
                             <ToastContainer autoClose={3000} limit={3} />
@@ -23,7 +23,7 @@ ReactDOM.render(
                             <App />
                         </FollowContextProvider>
                     </LikeContextProvider>
-                </PostContextProvider>
+                </PostsContextProvider>
             </ProfileContextProvider>
         </UserContextProvider>
     </StrictMode>,

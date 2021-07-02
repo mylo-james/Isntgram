@@ -1,11 +1,10 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
 import styled from 'styled-components';
 import Post from '../components/Post/Post';
-import { FollowContext, UserContext } from '../Contexts';
+import { FollowContext, PostsContext, UserContext } from '../Contexts';
 import NoFollows from '../components/NoFollows';
 import Loading from '../components/Loading/Loading';
-
 
 const Feed = styled.div`
     display: flex;
@@ -54,6 +53,8 @@ const LoadingWrapper = styled.div`
 const Home = () => {
     const { currentUser } = useContext(UserContext);
     const { follows } = useContext(FollowContext);
+    const { posts, setPosts, postOrder, setPostOrder } =
+        useContext(PostsContext);
 
     const [feedPosts, setFeedPosts] = useState([]);
     const [hasMore, setHasMore] = useState(true);
@@ -66,30 +67,55 @@ const Home = () => {
             setLoading(true);
             try {
                 const res = await fetch(
-                    `/api/post/${currentUser.id}/scroll/${feedPosts.length}`
+                    `/api/post/${currentUser.id}/scroll/${postOrder.size}`
                 );
 
                 if (!res.ok) throw res;
 
                 const { posts } = await res.json();
 
-                const nodeList = posts.map((post) => {
-                    return <Post key={`feedPost-${post.id}`} post={post} />;
+                let obj = posts.reduce(
+                    (obj, post) => {
+                        obj.posts = { ...obj.posts, [post.id]: post };
+                        obj.order = [...obj.order, post.id];
+                        return obj;
+                    },
+                    { order: [], posts: {} }
+                );
+
+                setPosts((posts) => ({ ...posts, ...obj.posts }));
+                console.log(postOrder);
+                setPostOrder((postOrder) => {
+                    for (let post of obj.order) {
+                        postOrder.add(post);
+                    }
+                    return postOrder;
                 });
-
-                setFeedPosts([...feedPosts, ...nodeList]);
-
-                if (posts.length < 3) {
-                    setHasMore(false);
-                    setLoading(false);
-                }
-
-                setLoading(false);
             } catch (e) {
                 console.error(e);
             }
         })();
     };
+
+    useEffect(() => {
+        if (!postOrder.size) return;
+        let nodeList = [];
+
+        postOrder.forEach((postId) => {
+            nodeList.push(
+                <Post key={`feedPost-${postId}`} post={posts[postId]} />
+            );
+        });
+
+        setFeedPosts(nodeList);
+
+        if (postOrder.size < 3) {
+            setHasMore(false);
+            setLoading(false);
+        }
+
+        setLoading(false);
+    }, [posts, postOrder]);
 
     if (!feedPosts) return null;
 

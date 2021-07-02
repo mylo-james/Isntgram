@@ -1,11 +1,9 @@
-
 // import DynamicModal from "../DynamicModal";
 import Modal from 'react-modal';
 import styled from 'styled-components';
 import Comment from './Comment';
 import Caption from './Caption';
 import { Link } from 'react-router-dom';
-
 
 const CommentWrapper = styled.div`
     padding: 0px 16px 16px;
@@ -44,11 +42,11 @@ const PostCommentSection = ({
     user: { username, id: userId },
     comments,
     created_at,
-    likes,
     isSinglePost,
+    likes,
     caption,
 }) => {
-    console.log(comments);
+    
 
     function timeSince(timeStamp) {
         timeStamp = new Date(timeStamp);

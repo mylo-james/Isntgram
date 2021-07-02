@@ -1,6 +1,6 @@
 import { UserContext, UserContextProvider } from './userContext';
 import { ProfileContext, ProfileContextProvider } from './profileContext';
-import { PostContext, PostContextProvider } from './postContext';
+import { PostsContext, PostsContextProvider } from './postContext';
 import { LikeContext, LikeContextProvider } from './likeContext';
 import { FollowContext, FollowContextProvider } from './followContext';
 
@@ -9,11 +9,11 @@ import { FollowContext, FollowContextProvider } from './followContext';
 export {
     UserContext,
     ProfileContext,
-    PostContext,
+    PostsContext,
     LikeContext,
     UserContextProvider,
     ProfileContextProvider,
-    PostContextProvider,
+    PostsContextProvider,
     LikeContextProvider,
     FollowContext,
     FollowContextProvider,

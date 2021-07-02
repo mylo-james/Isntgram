@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { RiHeartLine } from 'react-icons/ri';
 import { FaRegComment } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import { LikeContext, UserContext } from '../../Contexts';
+import { LikeContext, PostsContext, UserContext } from '../../Contexts';
 import { toast } from 'react-toastify';
 
 const IconWrapper = styled.div`
@@ -36,6 +36,7 @@ const IconWrapper = styled.div`
 const IconPost = ({ id: postId, isSinglePost }) => {
     const { currentUser } = useContext(UserContext);
     const { likes, setLikes } = useContext(LikeContext);
+    const { setPosts } = useContext(PostsContext);
 
     const likePost = async () => {
         try {
@@ -55,12 +56,16 @@ const IconPost = ({ id: postId, isSinglePost }) => {
 
             if (!res.ok) throw res;
 
-            const like = await res.json();
-            console.log(like);
+            const { like, likeList } = await res.json();
+
             setLikes({
                 ...likes,
                 [`${like.likeable_type}-${like.likeable_id}`]: like,
             });
+            setPosts((posts) => ({
+                ...posts,
+                [postId]: { ...posts[postId], likes: likeList },
+            }));
 
             toast.info('Liked post!', { autoClose: 1500 });
         } catch (e) {
@@ -87,6 +92,17 @@ const IconPost = ({ id: postId, isSinglePost }) => {
             delete newLikes[`post-${postId}`];
 
             setLikes(newLikes);
+
+            setPosts((posts) => {
+                let newPost = { ...posts[postId] };
+                let filtered = newPost.likes.filter(
+                    (ele) => ele.id !== like.id
+                );
+                return {
+                    ...posts,
+                    [postId]: { ...posts[postId], likes: filtered },
+                };
+            });
 
             toast.info('Unliked post!', { autoClose: 1500 });
 
