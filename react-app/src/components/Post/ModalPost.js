@@ -43,7 +43,6 @@ const ModalStyle = styled.div`
 
 const ModalPost = (props) => {
     const { postId, closeModal } = props;
-    const location = useLocation();
     return (
         <ModalStyle>
             {window.location.href.includes('/post/') ? (
@@ -53,7 +52,10 @@ const ModalPost = (props) => {
                     Go To Post
                 </Link>
             )}
-            <CopyToClipboard style={{ cursor: 'pointer' }} text={location}>
+            <CopyToClipboard
+                style={{ cursor: 'pointer' }}
+                text={window.location.href}
+            >
                 <button
                     onClick={() => {
                         toast.info('Copied to clipboard!');

@@ -6,7 +6,7 @@ import { ProfileContext, UserContext } from '../../Contexts';
 import ProfilePicModal from './ProfilePicModal';
 import { RiLogoutBoxRLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
-import { backendURL } from '../../config';
+
 const ProfileHeaderWrapper = styled.div`
     display: flex;
     height: 82px;
@@ -214,8 +214,8 @@ const ProfileHeader = (props) => {
         setIsEditProfilePicOpen(true);
     };
 
-    const logOut = () => {
-        localStorage.removeItem('Isntgram_access_token');
+    const logOut = async () => {
+        await fetch('/api/auth/logout');
         window.location.reload();
     };
 
