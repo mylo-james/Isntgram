@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
-import { Switch, BrowserRouter } from 'react-router-dom';
+import { Switch, BrowserRouter, useHistory } from 'react-router-dom';
 import { ProtectedRoute, AuthRoute } from './Routes';
 import Home from './Pages/Home';
 import Profile from './Pages/Profile';
@@ -18,6 +18,7 @@ function App() {
     let { setFollows } = useContext(FollowContext);
     let { setLikes } = useContext(LikeContext);
     let [loaded, setLoaded] = useState(false);
+    let history = useHistory();
 
     let getFollows = useCallback(async () => {
         if (!currentUser.id) return;
@@ -60,9 +61,13 @@ function App() {
                     'Content-Type': 'application/json',
                 },
             });
-            if (res.ok) {
+
+            console.log(res);
+            if (res.status === 200) {
                 let user = await res.json();
                 setCurrentUser(user);
+            } else {
+                setLoaded(true);
             }
         })();
     }, [setCurrentUser]);
