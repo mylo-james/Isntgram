@@ -84,7 +84,6 @@ const Home = () => {
                 );
 
                 setPosts((posts) => ({ ...posts, ...obj.posts }));
-                console.log(postOrder);
                 setPostOrder((postOrder) => {
                     for (let post of obj.order) {
                         postOrder.add(post);

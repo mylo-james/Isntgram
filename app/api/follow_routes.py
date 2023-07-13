@@ -43,9 +43,7 @@ def followUser():
 @follow_routes.route('', methods = ["DELETE"])
 def deleteFollow():
     data = request.json
-    print(data)
     exists = Follow.query.filter(Follow.user_id == data['userId']).filter(Follow.user_followed_id == data['userFollowedId']).first()
-    print(exists.to_dict())
     if not exists:
         return {"error": "Doesn't follow!"}
     follow = Follow.query.filter(Follow.user_id == data['userId']).filter(Follow.user_followed_id == data['userFollowedId']).first()

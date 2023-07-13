@@ -61,8 +61,6 @@ function App() {
                     'Content-Type': 'application/json',
                 },
             });
-
-            console.log(res);
             if (res.status === 200) {
                 let user = await res.json();
                 setCurrentUser(user);

@@ -46,7 +46,6 @@ const SinglePost = (props) => {
 
     if (!load) return null;
     let post = posts[id];
-    console.log(post);
     return (
         <>
             <SinglePostWrapper>

@@ -63,7 +63,6 @@ const CommentInputField = ({ id: postId, isSinglePost }) => {
 
         if (!res.ok) throw res;
         const comment = await res.json();
-        console.log(comment);
         setPosts((posts) => {
             let currentPost = posts[postId];
             let commentList = [...currentPost.comments, comment];
