@@ -8,20 +8,19 @@ from ..models import db, User, Post
 aws_routes = Blueprint("aws", __name__)
 
 UPLOAD_FOLDER = 'uploads'
-BUCKET = 'isntgramaa'
+BUCKET = 'isntgram'
 
 
 @aws_routes.route('/<id>', methods=["POST"])
 def upload(id):
     if request.method == "POST":
-        print('here')
         f = request.files['file']
         f.filename = change_name(f.filename)
         upload_file(f, BUCKET)
         user = User.query.filter(User.id == id).first()
-        user.profile_image_url = f'https://isntgramaa.s3.us-east-2.amazonaws.com/{f.filename}'
+        user.profile_image_url = f'https://isntgram.s3.us-east-2.amazonaws.com/{f.filename}'
         db.session.commit()
-        return {"img": f'https://isntgramaa.s3.us-east-2.amazonaws.com/{f.filename}'}
+        return {"img": f'https://isntgram.s3.us-east-2.amazonaws.com/{f.filename}'}
 
 
 @aws_routes.route('/post/<current_user_id>/<content>', methods=["POST"])
@@ -32,7 +31,7 @@ def upload_post(current_user_id, content):
     print('here also')
     upload_file(f, BUCKET)
     print("HERE")
-    image_url = f'https://isntgramaa.s3.us-east-2.amazonaws.com/{f.filename}'
+    image_url = f'https://isntgram.s3.us-east-2.amazonaws.com/{f.filename}'
     if content == 'null':
       content = ''
 
