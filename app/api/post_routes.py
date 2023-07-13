@@ -15,7 +15,6 @@ def index(length):
     posts = []
     posts = Post.query.offset(length).limit(3).all()
     for post in posts:
-        print(f"{length}: {post.id}")
         post_dict = post.to_dict()
         likes = Like.query.filter(
             Like.likeable_id == post_dict["id"] and Like.likeableType == "post"

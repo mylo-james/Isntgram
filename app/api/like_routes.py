@@ -32,7 +32,6 @@ def getLikes(likeableType, id):
 @like_routes.route("", methods=["POST"])
 def post_like():
     data = request.json
-    print(data)
     content = {}
     like = Like(
         user_id=data["userId"],
@@ -50,14 +49,12 @@ def post_like():
     likeList = []
     for like in likes:
         likeList.append(like.to_dict())
-    print(likeList)
     return {"like": like.to_dict(), "likeList": likeList}
 
 
 @like_routes.route("", methods=["DELETE"])
 def delete_like():
     data = request.json
-    print(data)
     like = Like.query.filter(Like.id == data["id"]).first()
 
     db.session.delete(like)

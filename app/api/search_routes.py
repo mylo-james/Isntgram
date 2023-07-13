@@ -8,10 +8,10 @@ search_routes = Blueprint("query", __name__)
 @search_routes.route('')
 def query():
     query = request.args.get('query')
-    print(query)
+
 
     userResults = User.query.filter(User.username.ilike(f'%{query}%')).all()
-    print(userResults)
+
 
     results = []
     

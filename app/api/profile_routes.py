@@ -26,7 +26,6 @@ def index(id):
 
     for post in posts:
         post_dict = post.to_dict()
-        print(post_dict)
         likes = Like.query.filter(Like.likeable_id == post_dict["id"] and Like.likeableType == 'post').count()
         comments = Comment.query.filter(Comment.post_id == post_dict["id"]).count()
         post_dict["like_count"] = likes

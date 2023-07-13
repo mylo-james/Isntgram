@@ -88,7 +88,6 @@ const RegisterForm = () => {
 
         if (res.status !== 200) {
             const { errors } = await res.json();
-            console.log(errors);
             showErrors(errors);
         } else {
             window.location.reload(false);

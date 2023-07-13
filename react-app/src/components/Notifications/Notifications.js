@@ -82,7 +82,6 @@ const Notifications = () => {
                 if (!res.ok) throw res;
 
                 const { notes } = await res.json();
-                console.log(notes);
                 const nodeList = notes.map((notification, i) => {
                     switch (notification.type) {
                         case 'comment':

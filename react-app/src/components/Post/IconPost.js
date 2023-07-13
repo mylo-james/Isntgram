@@ -45,7 +45,6 @@ const IconPost = ({ id: postId, isSinglePost }) => {
                 id: postId,
                 likeableType: 'post',
             };
-            console.log(body);
             const res = await fetch(`/api/like`, {
                 method: 'POST',
                 headers: {
@@ -76,7 +75,6 @@ const IconPost = ({ id: postId, isSinglePost }) => {
     const unlikePost = async () => {
         let like = likes[`post-${postId}`];
         if (!like) return;
-        console.log(like);
         try {
             const res = await fetch(`/api/like`, {
                 method: 'DELETE',
