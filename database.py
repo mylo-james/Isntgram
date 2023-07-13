@@ -1,12 +1,12 @@
 import secrets
 import datetime
 
-from app.models.comments import Comment
-from app.models.saved_posts import Saved_Post
-from app.models.posts import Post
-from app.models.likes import Like
-from app.models.follows import Follow
-from app.models.users import User
+from app.models.comment import Comment
+from app.models.saved_post import Saved_Post
+from app.models.post import Post
+from app.models.like import Like
+from app.models.follow import Follow
+from app.models.user import User
 from app import app, db
 from faker import Faker
 from random import *
