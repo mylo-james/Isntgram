@@ -1,0 +1,56 @@
+{
+  "name": "isntgram",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Modern Instagram clone - Full stack social media application",
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-copy-to-clipboard": "^5.0.3",
+    "react-dom": "^18.3.1",
+    "react-icons": "^3.11.0",
+    "react-infinite-scroll-component": "^6.1.0",
+    "react-modal": "^3.14.3",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "^5.0.1",
+    "react-toastify": "^7.0.4",
+    "styled-components": "^5.3.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "dev": "react-scripts start",
+    "backend": "cd .venv && source bin/activate && cd .. && python -m flask run",
+    "backend:dev": "cd .venv && source bin/activate && cd .. && python -m flask run --debug",
+    "full-dev": "concurrently \"npm run backend:dev\" \"npm run dev\""
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.3%",
+      "not ie 11",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      ">0.3%",
+      "not ie 11",
+      "not dead",
+      "not op_mini all"
+    ]
+  },
+  "proxy": "http://localhost:5000",
+  "overrides": {
+    "svgo": "^4.0.0",
+    "@svgr/plugin-svgo": "^8.1.0",
+    "@svgr/webpack": "^8.1.0",
+    "nth-check": "^2.1.1",
+    "postcss": "^8.4.31"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  }
+}

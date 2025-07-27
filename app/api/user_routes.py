@@ -28,8 +28,6 @@ def update_user():
     old_keys = set(old_user.values())
     new_keys = set(user.to_dict().values())
 
-    print(len(old_keys.intersection(new_keys)))
-    print(len(old_keys.intersection(new_keys)))
     if len(old_keys.intersection(new_keys)) == 6:
         return {"error": "No changes made"}, 401
 

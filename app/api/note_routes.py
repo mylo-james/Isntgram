@@ -32,7 +32,6 @@ def index(id, length):
     for like in all_likes_list:
         like_dict = like.to_dict()
         user = like.user.to_dict()
-        print("!!!!!!!!!!!!!!", like_dict['likeable_id'])
         if like_dict['likeable_type'] == 'post':
             post = Post.query.filter(Post.id == like_dict['likeable_id']).first()
         else:
@@ -41,9 +40,6 @@ def index(id, length):
         like_dict['post'] = post.to_dict()
         like_dict['type'] = "like"
         likes_list.append(like_dict)
-
-    # sorted_likes = sorted(likes_list, key = lambda like: like['created_at'])
-    # print(sorted_likes)
 
     comments = Comment.query.filter(Comment.post_id.in_(user_post_ids)).order_by(Comment.created_at.desc()).all()
 
