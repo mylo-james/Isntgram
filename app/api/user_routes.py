@@ -6,6 +6,17 @@ import jwt
 
 user_routes = Blueprint("users", __name__)
 
+@user_routes.route('/lookup/<username>')
+def lookup_user(username):
+    """
+    Look up a user by username and return basic user info
+    """
+    user = User.query.filter(User.username == username).first()
+    if not user:
+        return {"error": "User not found"}, 404
+    
+    return {"user": user.to_dict()}
+
 @user_routes.route('', methods=['PUT'])
 def update_user():
     data = request.json

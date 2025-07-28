@@ -34,12 +34,10 @@
     - POST /:type/:id - like the content of :type and :id
     - DELETE /:type/:id - unlike the content of :type and :id
 
-
 6. Saved - url_prefix = /api/save
     - Get / - get all posts that current user has saved
     - POST /:id - saves a post with :id to saved posts
     - DELETE /:id - unsaves a post of post :id
-
 
 7. Messages - url_prefix = /api/message
     - POST /:conversationId - sends a message to a conversation
@@ -55,7 +53,6 @@
     - GET /:type/content - gets all posts/users of :type and :content
     - POST /:type/:id/:content - adds taggable of :type, :id, :content
     - Delete /:type/:id/:content - removes tag if the comment or post is removed
-
 
 ## Frontend
 

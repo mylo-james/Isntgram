@@ -1,21 +1,24 @@
 # Isntgram Copilot Instructions
 
-> ⚠️ **Legacy Project Notice**: This is an old project from 2020 currently undergoing modernization. These instructions reflect the current codebase state but will be updated as we implement fixes and modernizations. See `MODERNIZATION_ROADMAP.md` for planned updates.
+> ✅ **Modernized Project (2025)**: Successfully modernized from 2020 codebase. Major migrations complete: React 18.3.1, React Router v6, Vite build system, ESLint/Prettier standards, 0 vulnerabilities achieved.
 >
-> 🔄 **Modernization Philosophy**: Existing patterns should be evaluated, not blindly followed. Prioritize modern best practices over legacy approaches. When suggesting changes, favor current industry standards over maintaining consistency with outdated code.
+> ✅ **CSS Migration Complete (Phase 2.4)**: Successfully migrated from styled-components to Tailwind CSS v4 with modern design tokens
+> 🎯 **Current Phase**: TypeScript Integration (Phase 2.3) - Adding type safety foundation
+> 📋 **Next Phase**: Performance Optimization & Testing - Final modernization touches
 
 ## Project Overview
 
-Full-stack Instagram clone with React frontend and Flask backend. Uses PostgreSQL for data persistence and AWS S3 for image storage. Built in 2020, currently undergoing modernization.
+Full-stack Instagram clone with modern React 18 frontend and Flask 3.1 backend. Uses PostgreSQL for data persistence and AWS S3 for image storage. Originally built in 2020, modernized to 2025 standards with Vite build system and comprehensive security updates.
 
 ## Architecture
 
-### Backend (Flask + SQLAlchemy)
+### Backend (Flask 3.1 + SQLAlchemy)
 
 - **Entry Point**: `app/__init__.py` - Flask app initialization with blueprint registration
 - **API Routes**: Each feature has its own blueprint in `app/api/` (auth, posts, users, etc.)
 - **Models**: SQLAlchemy models in `app/models/` with relationships for social media features
 - **Database**: PostgreSQL with Alembic migrations in `migrations/`
+- **Security**: Updated to Flask 3.1.1 with modern secure dependencies, 0 vulnerabilities
 
 **Key Blueprint Pattern**:
 
@@ -25,18 +28,28 @@ post_routes = Blueprint("posts", __name__)
 @post_routes.route("/<id>/scroll/<length>")  # Pagination pattern
 ```
 
-### Frontend (React + Context API)
+### Frontend (React 18 + Vite + Modern Tooling)
 
-- **Entry Point**: `react-app/src/App.js` with multiple context providers
+- **Entry Point**: `src/App.js` with multiple context providers
+- **Build System**: Vite 7.0.6 (migrated from Create React App for 10-100x faster builds)
+- **Routing**: React Router v6.28.0 (migrated from v5 with modern Routes/Route syntax)
 - **State Management**: Multiple React Contexts (`UserContext`, `PostsContext`, `LikeContext`, etc.)
-- **Routing**: React Router v5 with custom `ProtectedRoute` and `AuthRoute` components
-- **Styling**: Styled-components for component-level styling
+- **Code Quality**: ESLint 8.57.1 + Prettier with single quotes, accessibility rules
+- **Styling**: Tailwind CSS v4 with custom Instagram design tokens (migrated from styled-components)
 
 **Context Pattern**:
 
 ```javascript
 // All contexts follow this pattern in Contexts/
 const { currentUser, setCurrentUser } = useContext(UserContext);
+```
+
+**Modern Router Pattern (v6)**:
+
+```javascript
+// Updated from React Router v5 to v6
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // replaces useHistory
 ```
 
 ## Critical Patterns
@@ -81,8 +94,8 @@ Uses `react-infinite-scroller` with pagination via URL params:
 # Backend (from root)
 python -m flask run  # Uses .flaskenv
 
-# Frontend (from react-app/)
-npm start  # Proxies to localhost:5000
+# Frontend (from root)
+npm run dev  # Vite dev server on localhost:3003
 
 # Database
 flask db upgrade  # Run migrations
@@ -91,7 +104,7 @@ flask db upgrade  # Run migrations
 ### VS Code Tasks
 
 - "Start Flask Backend" - Runs Flask dev server
-- "Start React Frontend" - Runs React dev server
+- "Start React Frontend" - Runs Vite dev server
 - "Open Modernization Roadmap" - Opens project roadmap
 
 ### File Upload Pattern
@@ -119,17 +132,19 @@ All image uploads go through `app/api/aws_routes.py`:
 
 ### Component Structure
 
-- Pages in `react-app/src/Pages/`
-- Reusable components in `react-app/src/components/`
+- Pages in `src/Pages/` (moved from react-app/src/Pages/)
+- Reusable components in `src/components/` (moved from react-app/src/components/)
 - Context providers wrap entire app in `App.js`
 
 ## Current Technical Debt
 
-- React 17 (needs update to 18+)
-- 175 npm vulnerabilities
-- No TypeScript
+- ~~React 17~~ ✅ **COMPLETED**: Updated to React 18.3.1
+- ~~175 npm vulnerabilities~~ ✅ **COMPLETED**: 0 vulnerabilities achieved
+- No TypeScript (Phase 2.3 planned after CSS migration)
+- ~~No code standards~~ ✅ **COMPLETED**: ESLint + Prettier configured
+- ~~Outdated build system~~ ✅ **COMPLETED**: Migrated to Vite 7.0.6
+- styled-components dependency (Phase 2.4 complete)
 - Prop drilling instead of proper state management
-- N+1 queries in some endpoints (see `profile_routes.py`)
 
 ## Database Schema
 
@@ -144,5 +159,5 @@ Key tables: `users`, `posts`, `comments`, `likes`, `follows`
 
 - **AWS S3**: Image storage with public URLs
 - **PostgreSQL**: Via SQLAlchemy ORM
-- **React Proxy**: Frontend development proxies to Flask backend
+- **Vite Proxy**: Frontend development proxies API requests to Flask backend
 - **CSRF**: Flask-WTF tokens in cookies, validated on forms

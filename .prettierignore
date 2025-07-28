@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+.venv/
+
+# Build outputs
+build/
+dist/
+*.min.js
+*.min.css
+
+# Package files
+package-lock.json
+yarn.lock
+
+# Logs
+*.log
+
+# Environment files
+.env*
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Static assets
+public/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+
+# Documentation
+*.md
+
+# Archives
+deployment-archive/

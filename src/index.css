@@ -1,0 +1,194 @@
+@import "tailwindcss";
+
+/* Instagram-inspired custom styles */
+@theme {
+  --color-instagram-blue: #405de6;
+  --color-instagram-purple: #5b51d8;
+  --color-instagram-pink: #833ab4;
+  --color-instagram-orange: #fd1d1d;
+  --color-instagram-yellow: #fcb045;
+
+  --font-family-instagram:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+
+  --spacing-18: 4.5rem;
+  --spacing-88: 22rem;
+
+  --max-width-instagram: 935px;
+
+  --border-radius-instagram: 8px;
+
+  /* Custom animations - Tailwind v4 style */
+  --animate-slide-in: slideIn 2s 4s forwards;
+  --animate-fade-in: fadeIn 5s 3s forwards;
+}
+
+/* Define keyframes */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer base {
+  html {
+    font-family: var(--font-family-instagram);
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+@layer components {
+  /* Instagram-style button */
+  .btn-instagram {
+    @apply bg-gradient-to-r from-instagram-purple to-instagram-pink text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 hover:shadow-lg;
+  }
+
+  /* Instagram-style card */
+  .card-instagram {
+    @apply bg-white border border-gray-200 rounded-lg shadow-sm;
+  }
+
+  /* Instagram-style input */
+  .input-instagram {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
+}
+
+/* Existing styled-components migration helpers */
+@layer utilities {
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .absolute-center {
+    @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2;
+  }
+
+  .animate-slide-in {
+    animation: slideIn 1.5s ease-out 3s forwards;
+    transform: translateX(100%);
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 2s ease-out 2s forwards;
+    opacity: 0;
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.5s ease-out forwards;
+    opacity: 0;
+  }
+
+  /* Loading animations from original styled-components */
+  .for-color {
+    animation: yTranslate 2s alternate infinite;
+  }
+
+  .rev-color {
+    animation: yTranslateRev 2s alternate infinite;
+  }
+
+  .red-box {
+    animation: rotate0 4s infinite;
+  }
+
+  .yellow-box {
+    animation: rotate45 4s infinite;
+  }
+
+  .green-box {
+    animation: rotate90 4s infinite;
+  }
+
+  .blue-box {
+    animation: rotate135 4s infinite;
+  }
+
+  .red2-box {
+    animation: rotate0 4s infinite;
+  }
+
+  .yellow2-box {
+    animation: rotate45 4s infinite;
+  }
+
+  .green2-box {
+    animation: rotate90 4s infinite;
+  }
+
+  .blue2-box {
+    animation: rotate135 4s infinite;
+  }
+}
+
+/* Loading animation keyframes */
+@keyframes yTranslate {
+  0% {
+    transform: translateY(15vh);
+  }
+  100% {
+    transform: translateY(10.2vh);
+  }
+}
+
+@keyframes yTranslateRev {
+  0% {
+    transform: translateY(15vh);
+  }
+  100% {
+    transform: translateY(20vh);
+  }
+}
+
+@keyframes rotate0 {
+  0% {
+    transform: rotateZ(0deg);
+  }
+  100% {
+    transform: rotateZ(180deg);
+  }
+}
+
+@keyframes rotate45 {
+  0% {
+    transform: rotateZ(45deg);
+  }
+  100% {
+    transform: rotateZ(225deg);
+  }
+}
+
+@keyframes rotate90 {
+  0% {
+    transform: rotateZ(90deg);
+  }
+  100% {
+    transform: rotateZ(270deg);
+  }
+}
+
+@keyframes rotate135 {
+  0% {
+    transform: rotateZ(135deg);
+  }
+  100% {
+    transform: rotateZ(315deg);
+  }
+}

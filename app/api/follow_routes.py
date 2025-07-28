@@ -14,20 +14,18 @@ def getFollows(id):
     follows = Follow.query.filter(Follow.user_followed_id == id).all()
 
     followsList = []
-    for follower in follows:
-        user = User.query.filter(follower.user_id == User.id).first()
-        followsList.append(user.to_dict())
-    return {"users": followsList}
+    for follow in follows:
+        followsList.append(follow.to_dict())
+    return {"follows": followsList}
 
 @follow_routes.route('<id>/following')
 def getFollowing(id):
     follows = Follow.query.filter(Follow.user_id == id).all()
 
     followsList = []
-    for follower in follows:
-        user = User.query.filter(follower.user_followed_id == User.id).first()
-        followsList.append(user.to_dict())
-    return {"users": followsList}
+    for follow in follows:
+        followsList.append(follow.to_dict())
+    return {"follows": followsList}
 
 @follow_routes.route('', methods=["POST"])
 def followUser():

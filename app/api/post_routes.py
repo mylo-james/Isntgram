@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import join
 from ..models import db, Post, User, Follow, Like, Comment
@@ -23,6 +23,29 @@ def index(length):
         post_dict["like_count"] = likes
         post_dict["comment_count"] = comments
         post_list.append(post_dict)
+    return {"posts": post_list}
+
+
+@post_routes.route("/explore/<length>")
+def explore(length):
+    """Get randomized posts for explore page"""
+    length = int(length)
+    post_list = []
+    
+    # Get randomized posts for explore page
+    posts = Post.query.order_by(func.random()).offset(length).limit(3).all()
+    
+    for post in posts:
+        post_dict = post.to_dict()
+        likes = Like.query.filter(
+            Like.likeable_id == post_dict["id"],
+            Like.likeable_type == "post"
+        ).count()
+        comments = Comment.query.filter(Comment.post_id == post_dict["id"]).count()
+        post_dict["like_count"] = likes
+        post_dict["comment_count"] = comments
+        post_list.append(post_dict)
+    
     return {"posts": post_list}
 
 

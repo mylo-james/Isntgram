@@ -26,11 +26,9 @@ Below is a representation of all of the tables and their relations
     * User_Conversations.conversation_id => Conversation.id
     * Messages.conversation_id => Converstaions.id
 
-
 5. user_conversations: Many to many relationship between conversations and users
     * User_Conversations.user_id => Users.id
     * User_Conversations.conversation_id => Conversation.id
-
 
 6. Likes: Polymorphic relationship for liking Posts/Comments
     * Likes.userId => Users.id

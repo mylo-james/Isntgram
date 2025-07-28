@@ -1,6 +1,5 @@
 # Feature List
 
-
 1. Create a user account
     - Auth protected. Must be logged in to navigate to any page other than login/sign up.
     - Encrypted Password
@@ -24,6 +23,7 @@
     - Your feed is made up of posts from users you follow
 
 # Future Updates
+
 1. Searchable tags
     - adding a string after a '#' allows that post to be searchable by that hashtag.
     - adding a string after a '@' allows user ability to tag another user.

@@ -1,12 +1,14 @@
 
-
 # Isntgram
+
 *By James Robertson, Mylo James, and Aaron Pierskalla - [Visit Isntgram](http://isntgram.herokuapp.com/)*
 
 **Table of Contents**
+
 * [Technologies Used](#technologies-used)
 * [Key Features](#key-features)
-* [Isntgram Intro](#Isntgram)
+* [Development Setup](#development-setup)
+* [Isntgram Intro](#isntgram)
 * [Software Arcitecture](#software-architecture)
 * [Frontend Technologies](#frontend-overview)
 * [Backend Technologies](#backend-overview)
@@ -14,53 +16,111 @@
 * [Future Implementations](#future-implementations)
 
 ## Technologies Used
-* React
-* Postgress
-* Flask
+
+* React 18.3.1 with TypeScript
+* PostgreSQL
+* Flask 3.1
 * SQLAlchemy
 * AWS S3
+* Vite 7.0.6
+* Tailwind CSS v4
 * JSON Web Tokens
 
 ## Key Features
 
 1. Create a user account
-    - Auth protected. Must be logged in to navigate to any page other than login/sign up.
-    - Encrypted Password
-    - Once registered ability to change info
+    * Auth protected. Must be logged in to navigate to any page other than login/sign up.
+    * Encrypted Password
+    * Once registered ability to change info
 
 2. Share Images
-    - Post images to your page
-    - Your images show up in the photo feed
+    * Post images to your page
+    * Your images show up in the photo feed
 
 3. Photo feed
-    - Home pages shows feed of all images from users you follow organized by date posted
+    * Home pages shows feed of all images from users you follow organized by date posted
 
 4. Likes
-    - Ability to like posts and comments.
-
+    * Ability to like posts and comments.
 
 6. Follow Users
-    - Ability to follow and be followed.
-    - Your feed is made up of posts from users you follow
+    * Ability to follow and be followed.
+    * Your feed is made up of posts from users you follow
 
+## Development Setup
 
+### Prerequisites
+* Python 3.x
+* Node.js 18+
+* PostgreSQL
+
+### Quick Start
+
+**Option 1: Use the start script (recommended)**
+
+```bash
+./start.sh
+```
+
+**Option 2: Use npm scripts**
+
+```bash
+# Start both backend and frontend
+npm run full-dev
+# or
+npm run start:all
+# or 
+npm run dev:all
+
+# Start individually
+npm run backend:dev  # Flask backend with debug mode
+npm run dev          # Vite frontend
+```
+
+**Option 3: Manual setup**
+
+```bash
+# Backend (Terminal 1)
+source .venv/bin/activate
+python -m flask run --debug
+
+# Frontend (Terminal 2)  
+npm run dev
+```
+
+### Services
+* **Backend**: <http://localhost:8080>
+* **Frontend**: <http://localhost:3000> (or next available port)
+
+### Development Commands
+
+```bash
+npm run type-check     # TypeScript type checking
+npm run lint          # ESLint code linting  
+npm run format        # Prettier code formatting
+npm run build         # Production build
+npm run code-quality  # Run all quality checks
+```
 
 ## Isntgram Intro
+
 Isn'tgram is a fullstack photo sharing app modeled after Instagram that is built with a React frontend and a Flask Python backend.
 Users can share and upload photos, follow other users
 
-
 ## Software Architecture
+
 Isntgram was developed with Javascript and React on the frontend and Python, Flask and Postgres on the backend. The data needed for this application is solely dependent on user input and uploading of photos. The inputs are stored in Postgres and rendered to the appropriate pages. The backend is responsible for handling all frontend requests through the servers, the servers then pull data from Postgres, and relay the information to the frontend.
 
 The backend serves the frontend, responds to frontend requests, acts as an intermediary to serve Spotify data to the frontend, and fetches data from the MongoDB database.
 
-### Frontend Technologies:
+### Frontend Technologies
+
 #### React
+
 Isntgram is a application that uses JSX, a React feature that makes it easier to render HTML with Javscript. JSX made it simple to recycle components and to render data dynamically. React also helps store components in an organized manner. Reacts ability to manipulate state of each components through hooks is another advantage. React hooks is a simple solution to controlling the varying information.
 
-
 ##### Infinite Scroll implementation
+
 ```jsx
 const fetchMore = () => {
     if (!currentUserId) return;
@@ -68,7 +128,7 @@ const fetchMore = () => {
     (async ()=>{
        const len = toRender.length;
       try {
-      const res = await fetch(`/api/post/scroll/${len * 3}`, {
+      const res = await apiCall(`/api/post/scroll/${len * 3}`, {
         Authorization: localStorage.getItem("Isntgram_access_token"),
       })
       const obj = await res.json();
@@ -108,20 +168,25 @@ const fetchMore = () => {
 
 
 ```
+
 #### Infinite Scrolll
+
 The [Infinite Scroll](https://www.npmjs.com/package/react-toastify) infinite scroll is a popular Javascript plug-in that automatically renders the next pages without the user having to refresh the page to see more content. The library for infinite scroll is robust and thorough which makes it easy to incorporate into Isntgram.
 
 Another great feature of inifite scroll is the ability to navigate of the page and return to find their position is still maintained, which is perfect feature for a social media site.
 
 #### Toasts
+
 React [toast](https://www.npmjs.com/package/react-toastify) is a small library that renders small popup notifications with a little message for the user. A toast only lasts a couple seconds but gives the user insight on whether their action was successfully or unsuccessfully completed.
 
-
 ## Backend
+
 Isntgram uses a Python server with Postgres as the database. Compared to previous projects, the backend for Isntgram is much more complex due to the numerous relationships tables had with one another. Although, the backend is more complex, it was made easier using Python and Flask. Below is a more detailed description of our experience working on the backed.
 
 ### Backend Technologies
+
 ##### Code for Python Backend
+
 ```Python
 @bp.route('/<post_id>')
 def get_post(post_id):
@@ -157,27 +222,31 @@ def get_post(post_id):
 
     return {"post": post_dict, "comments": comments_list, "likes_post": user_list}
 ```
+
 #### Python
+
 [Python](https://docs.python.org/3/) was the perfect option for the server-side framework. The syntax for Python is simple to read and write which allows developers to build backends faster. With Python, the structure of building models and relationships allows the developer to easily write routes without having query the database multiple times. The light-weight nature of Python made writing the backend fast and efficient.
 
 #### Flask
+
 Python also supports the [Flask](https://flask.palletsprojects.com/en/1.1.x/) framework. Flask is light-weight framework that is intended to get projects up and running quickly and efficiently. Building the server using Flask was much faster when compared to other backend frameworks and languages.
 
 #### Postgres
+
 [Postgres](https://www.mongodb.com/) was perfect for this project because its collections of JSON-like records made it very easy to store the artist information, which is in JSON object form.
 
-
 ## Conclusion
+
 The technologies used to create Instgram were challenging, complex and fun. Building this amazing app as a great team is something we are all proud of. Check out the app and feel free to reach out to any of us!
 
-
 ## Future Implementations
+
 1. Save Posts
-    - Save posts for ability to go back and look at posts you've saved
+    * Save posts for ability to go back and look at posts you've saved
 
 2. Searchable tags
-    - adding a string after a '#' allows that post to be searchable by that hashtag.
-    - adding a string after a '@' allows user ability to tag another user.
+    * adding a string after a '#' allows that post to be searchable by that hashtag.
+    * adding a string after a '@' allows user ability to tag another user.
 
 3. Direct Messaging
-    - Slide into those Dm's
+    * Slide into those Dm's
