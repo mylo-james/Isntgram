@@ -6,6 +6,7 @@ import ProfilePicModal from './ProfilePicModal';
 import { RiLogoutBoxRLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import { apiCall } from '../../utils/apiMiddleware';
+import { Follow } from '../../types';
 
 Modal.setAppElement('#root');
 
@@ -28,6 +29,27 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ windowSize }) => {
 
   const { profileData, setProfileData } = useProfile();
 
+  // All hooks must be called before conditional returns
+  useEffect(() => {
+    if (!currentUser?.id || !profileData) return;
+
+    (async () => {
+      try {
+        const { follows: currentUserFollowing } = (await apiCall(
+          `/api/follow/${currentUser.id}/following`
+        )) as { follows: Follow[] };
+
+        const followingList: number[] = [];
+        currentUserFollowing.forEach((follow: Follow) => {
+          followingList.push(follow.userFollowedId);
+        });
+        setCurrentUserFollowingList(followingList);
+      } catch {
+        // console.error(e);
+      }
+    })();
+  }, [profileData, currentUser?.id]);
+
   if (!profileData) {
     return null;
   }
@@ -40,28 +62,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ windowSize }) => {
     posts: userPosts,
   } = profileData;
 
-  const numPosts = userPosts?.length || 0;
-  const fullName = profileData.fullName || profileData.username;
-
-  useEffect(() => {
-    if (!currentUser?.id) return;
-
-    (async () => {
-      try {
-        const { follows: currentUserFollowing } = await apiCall(
-          `/api/follow/${currentUser.id}/following`
-        );
-
-        const followingList: number[] = [];
-        currentUserFollowing.forEach((follow: any) => {
-          followingList.push(follow.userFollowedId);
-        });
-        setCurrentUserFollowingList(followingList);
-      } catch (e) {
-        console.error(e);
-      }
-    })();
-  }, [profileData, currentUser?.id]);
+  const numPosts = userPosts?.length ?? 0;
+  const fullName = profileData.fullName ?? profileData.username;
 
   const closeEditPicModal = () => {
     setIsEditProfilePicOpen(false);
@@ -104,21 +106,21 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ windowSize }) => {
     e.preventDefault();
     const body = { userId: currentUser?.id, userFollowedId: profileId };
     try {
-      const response = await apiCall('/api/follow', {
+      const response = (await apiCall('/api/follow', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
-      });
+      })) as Follow;
 
-      const updatesList = [...(profileData.followers || []), response];
+      const updatesList = [...(profileData.followers ?? []), response];
       setProfileData({
         ...profileData,
         followers: updatesList,
       });
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // console.error(e);
     }
   };
 
@@ -126,24 +128,24 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ windowSize }) => {
     e.preventDefault();
     const body = { userId: currentUser?.id, userFollowedId: profileId };
     try {
-      const response = await apiCall('/api/follow', {
+      const response = (await apiCall('/api/follow', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
-      });
+      })) as { userId: number };
       const { userId: deletedId } = response;
 
-      const filteredList = (profileData.followers || []).filter(
-        (user: any) => user.userId !== deletedId
+      const filteredList = (profileData.followers ?? []).filter(
+        (user: Follow) => user.userId !== deletedId
       );
       setProfileData({
         ...profileData,
         followers: filteredList,
       });
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // console.error(e);
     }
   };
 
@@ -158,6 +160,18 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ windowSize }) => {
           <div
             className='h-[82px] w-[77px] mr-7 flex-shrink-0 rounded-full overflow-hidden border border-gray-300 cursor-pointer'
             onClick={currentUser?.id === profileId ? changeProfImg : undefined}
+            onKeyDown={
+              currentUser?.id === profileId
+                ? (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      changeProfImg();
+                    }
+                  }
+                : undefined
+            }
+            role={currentUser?.id === profileId ? 'button' : undefined}
+            tabIndex={currentUser?.id === profileId ? 0 : undefined}
           >
             <img
               className='w-full h-full object-cover'
@@ -212,6 +226,18 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ windowSize }) => {
           <div
             className='flex-shrink-0 cursor-pointer rounded-full overflow-hidden border border-gray-300'
             onClick={currentUser?.id === profileId ? changeProfImg : undefined}
+            onKeyDown={
+              currentUser?.id === profileId
+                ? (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      changeProfImg();
+                    }
+                  }
+                : undefined
+            }
+            role={currentUser?.id === profileId ? 'button' : undefined}
+            tabIndex={currentUser?.id === profileId ? 0 : undefined}
           >
             <img
               className='w-20 h-20 sm:w-32 sm:h-32 lg:w-40 lg:h-40 object-cover'
@@ -267,18 +293,34 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ windowSize }) => {
               <div
                 className='text-sm cursor-pointer hover:text-gray-600'
                 onClick={() => setIsFollowersOpen(true)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setIsFollowersOpen(true);
+                  }
+                }}
+                role='button'
+                tabIndex={0}
               >
                 <span className='font-semibold'>
-                  {profileData.followers?.length || 0}
+                  {profileData.followers?.length ?? 0}
                 </span>{' '}
                 followers
               </div>
               <div
                 className='text-sm cursor-pointer hover:text-gray-600'
                 onClick={() => setIsFollowingOpen(true)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setIsFollowingOpen(true);
+                  }
+                }}
+                role='button'
+                tabIndex={0}
               >
                 <span className='font-semibold'>
-                  {profileData.following?.length || 0}
+                  {profileData.following?.length ?? 0}
                 </span>{' '}
                 following
               </div>

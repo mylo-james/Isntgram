@@ -28,12 +28,20 @@
     "dev:all": "concurrently \"npm run backend:dev\" \"npm run dev\"",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint src --ext .js,.jsx,.ts,.tsx --fix",
+    "lint:strict": "eslint src --ext .js,.jsx,.ts,.tsx --max-warnings 0",
     "mdlint": "markdownlint '**/*.md' --ignore node_modules",
     "mdlint:fix": "markdownlint '**/*.md' --ignore node_modules --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css,scss,md,json}\"",
     "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,css,scss,md,json}\"",
     "type-check": "tsc --noEmit",
-    "code-quality": "npm run lint && npm run mdlint && npm run format:check && npm run type-check"
+    "type-check:strict": "tsc --noEmit --strict",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "validate": "npm run lint:strict && npm run type-check && npm run format:check",
+    "validate:fix": "npm run lint:fix && npm run format && npm run validate",
+    "validate:full": "npm run lint:strict && npm run type-check:strict && npm run format:check && npm run mdlint && npm run test:unit",
+    "validate:quick": "npm run lint && npm run type-check",
+    "code-quality": "npm run validate:full"
   },
   "browserslist": {
     "production": [

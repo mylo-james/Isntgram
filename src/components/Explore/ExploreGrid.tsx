@@ -1,17 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { useUser } from "../../hooks/useContexts";
-import { Post } from "../../types";
-import { apiCall } from "../../utils/apiMiddleware";
+import React, { useState, useEffect, useRef } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { useUser } from '../../hooks/useContexts';
+import { Post } from '../../types';
+import { apiCall } from '../../utils/apiMiddleware';
 
-import Layout1 from "./Layout1";
-import Layout2 from "./Layout2";
-import Layout3 from "./Layout3";
+import Layout1 from './Layout1';
+import Layout2 from './Layout2';
+import Layout3 from './Layout3';
 
 const ExploreGrid: React.FC = () => {
   const { currentUser } = useUser();
 
-  const [toRender, setToRender] = useState<any[]>([]);
+  const [toRender, setToRender] = useState<React.ReactElement[]>([]);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const totalPostsLoadedRef = useRef<number>(0);
@@ -35,7 +35,7 @@ const ExploreGrid: React.FC = () => {
 
   // Keep loading until we have sufficient content for scrolling
   const initialBulkLoad = async () => {
-    if (fetchingRef.current || initialLoadCompleteRef.current) return;
+    if (fetchingRef.current ?? initialLoadCompleteRef.current) return;
 
     fetchingRef.current = true;
     setLoading(true);
@@ -47,7 +47,9 @@ const ExploreGrid: React.FC = () => {
 
     try {
       while (componentsLoaded < minComponentsNeeded && stillHasMore) {
-        const obj = await apiCall(`/api/post/explore/${currentOffset}`);
+        const obj = (await apiCall(`/api/post/explore/${currentOffset}`)) as {
+          posts: Post[];
+        };
         const photoArray = obj.posts;
 
         if (photoArray.length === 0) {
@@ -73,8 +75,8 @@ const ExploreGrid: React.FC = () => {
       totalPostsLoadedRef.current = currentOffset;
       setHasMore(stillHasMore);
       initialLoadCompleteRef.current = true;
-    } catch (error) {
-      console.error("Error during bulk load:", error);
+    } catch {
+      // console.error('Error during bulk load:', error);
       setHasMore(false);
     } finally {
       setLoading(false);
@@ -95,7 +97,7 @@ const ExploreGrid: React.FC = () => {
     if (
       toRender.length === 0 ||
       photoArray.length < 3 ||
-      !toRender[toRender.length - 1]?.key?.includes("layout1key")
+      !toRender[toRender.length - 1]?.key?.includes('layout1key')
     ) {
       return [
         <Layout1 key={`layout1key-${uniqueId}`} componentPhotos={photoArray} />,
@@ -115,9 +117,8 @@ const ExploreGrid: React.FC = () => {
 
   const fetchMore = () => {
     if (
-      !currentUser?.id ||
-      loading ||
-      fetchingRef.current ||
+      (!currentUser?.id || loading) ??
+      fetchingRef.current ??
       !initialLoadCompleteRef.current
     ) {
       return;
@@ -132,7 +133,9 @@ const ExploreGrid: React.FC = () => {
 
     (async () => {
       try {
-        const obj = await apiCall(`/api/post/explore/${currentOffset}`);
+        const obj = (await apiCall(`/api/post/explore/${currentOffset}`)) as {
+          posts: Post[];
+        };
         const photoArray = obj.posts;
 
         if (photoArray.length === 0) {
@@ -159,8 +162,8 @@ const ExploreGrid: React.FC = () => {
 
         setLoading(false);
         fetchingRef.current = false;
-      } catch (error) {
-        console.error("Error fetching more posts:", error);
+      } catch {
+        // console.error('Error fetching more posts:', error);
         setHasMore(false);
         setLoading(false);
         fetchingRef.current = false;
@@ -173,14 +176,14 @@ const ExploreGrid: React.FC = () => {
   }
 
   return (
-    <div key="gridWrapper" className="mx-auto mb-[10vh] w-[95vw] max-w-[614px]">
+    <div key='gridWrapper' className='mx-auto mb-[10vh] w-[95vw] max-w-[614px]'>
       <InfiniteScroll
         dataLength={toRender.length}
         next={fetchMore}
         hasMore={hasMore}
-        loader={<div className="text-center py-4">Loading more posts...</div>}
+        loader={<div className='text-center py-4'>Loading more posts...</div>}
         endMessage={
-          <p className="text-center text-gray-500 py-4">
+          <p className='text-center text-gray-500 py-4'>
             <b>Yay! You have seen it all</b>
           </p>
         }

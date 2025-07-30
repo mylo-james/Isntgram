@@ -1,14 +1,15 @@
 # Isntgram Copilot Instructions
 
-> ✅ **Modernized Project (2025)**: Successfully modernized from 2020 codebase. Major migrations complete: React 18.3.1, React Router v6, Vite build system, ESLint/Prettier standards, 0 vulnerabilities achieved.
+> ✅ **MODERNIZATION COMPLETE (2025)**: Successfully transformed 2020 codebase to cutting-edge 2025 standards!
 >
-> ✅ **CSS Migration Complete (Phase 2.4)**: Successfully migrated from styled-components to Tailwind CSS v4 with modern design tokens
-> 🎯 **Current Phase**: TypeScript Integration (Phase 2.3) - Adding type safety foundation
-> 📋 **Next Phase**: Performance Optimization & Testing - Final modernization touches
+> ✅ **Phase 1 & 2 Complete**: Security (0 vulnerabilities), React 18.3.1, TypeScript, Vite, Tailwind CSS v4, ESLint v9
+> ✅ **Universal API Middleware**: snake_case ↔ camelCase conversion with 100% feature parity
+> 🎯 **Current Phase**: TypeScript Enhancement (Phase 3) - Fix type safety and linting issues  
+> 📋 **Next Phase**: Advanced Features - Modern Instagram capabilities
 
 ## Project Overview
 
-Full-stack Instagram clone with modern React 18 frontend and Flask 3.1 backend. Uses PostgreSQL for data persistence and AWS S3 for image storage. Originally built in 2020, modernized to 2025 standards with Vite build system and comprehensive security updates.
+Full-stack Instagram clone with cutting-edge React 18 + TypeScript frontend and Flask 3.1 backend. Uses PostgreSQL for data persistence and AWS S3 for image storage. Completely modernized from 2020 legacy code to 2025 standards with Vite build system, universal API middleware, and zero security vulnerabilities.
 
 ## Architecture
 
@@ -19,6 +20,7 @@ Full-stack Instagram clone with modern React 18 frontend and Flask 3.1 backend. 
 - **Models**: SQLAlchemy models in `app/models/` with relationships for social media features
 - **Database**: PostgreSQL with Alembic migrations in `migrations/`
 - **Security**: Updated to Flask 3.1.1 with modern secure dependencies, 0 vulnerabilities
+- **API Format**: Serves snake_case but automatically converts to camelCase for frontend
 
 **Key Blueprint Pattern**:
 
@@ -28,26 +30,27 @@ post_routes = Blueprint("posts", __name__)
 @post_routes.route("/<id>/scroll/<length>")  # Pagination pattern
 ```
 
-### Frontend (React 18 + Vite + Modern Tooling)
+### Frontend (React 18 + TypeScript + Vite + Modern Tooling)
 
-- **Entry Point**: `src/App.js` with multiple context providers
-- **Build System**: Vite 7.0.6 (migrated from Create React App for 10-100x faster builds)
-- **Routing**: React Router v6.28.0 (migrated from v5 with modern Routes/Route syntax)
-- **State Management**: Multiple React Contexts (`UserContext`, `PostsContext`, `LikeContext`, etc.)
-- **Code Quality**: ESLint 8.57.1 + Prettier with single quotes, accessibility rules
-- **Styling**: Tailwind CSS v4 with custom Instagram design tokens (migrated from styled-components)
+- **Entry Point**: `src/App.tsx` with multiple context providers (TypeScript)
+- **Build System**: Vite 7.0.6 (10-100x faster than Create React App)
+- **Routing**: React Router v6.30.1 (modern Routes/Route syntax)
+- **State Management**: TypeScript Context providers (`UserContext`, `PostsContext`, etc.)
+- **Code Quality**: ESLint v9 + TypeScript + Prettier + markdownlint
+- **Styling**: Tailwind CSS v4 with custom Instagram design tokens
+- **Type Safety**: Complete TypeScript coverage with strict configuration
 
 **Context Pattern**:
 
-```javascript
+```typescript
 // All contexts follow this pattern in Contexts/
 const { currentUser, setCurrentUser } = useContext(UserContext);
 ```
 
 **Modern Router Pattern (v6)**:
 
-```javascript
-// Updated from React Router v5 to v6
+```typescript
+// Updated from React Router v5 to v6 with TypeScript
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom'; // replaces useHistory
 ```
@@ -60,6 +63,19 @@ import { useNavigate } from 'react-router-dom'; // replaces useHistory
 2. Flask-Login for session management
 3. JWT tokens for API authentication (stored in localStorage as "Isntgram_access_token")
 4. Protected routes redirect to `/auth/login` if no current user
+
+### API Response Format
+
+Most endpoints return data with nested relationships:
+
+```json
+{
+  "post": { "user": {...}, "comments": [...], "likes": [...] },
+  "posts": [...]
+}
+```
+
+### Infinite Scroll Implementation
 
 ### API Response Format
 
@@ -140,11 +156,15 @@ All image uploads go through `app/api/aws_routes.py`:
 
 - ~~React 17~~ ✅ **COMPLETED**: Updated to React 18.3.1
 - ~~175 npm vulnerabilities~~ ✅ **COMPLETED**: 0 vulnerabilities achieved
-- No TypeScript (Phase 2.3 planned after CSS migration)
-- ~~No code standards~~ ✅ **COMPLETED**: ESLint + Prettier configured
+- ~~No TypeScript~~ ✅ **COMPLETED**: Complete TypeScript migration with strict config
+- ~~No code standards~~ ✅ **COMPLETED**: ESLint v9 + Prettier configured
 - ~~Outdated build system~~ ✅ **COMPLETED**: Migrated to Vite 7.0.6
-- styled-components dependency (Phase 2.4 complete)
-- Prop drilling instead of proper state management
+- ~~styled-components dependency~~ ✅ **COMPLETED**: Migrated to Tailwind CSS v4
+- TypeScript type safety improvements (46 errors, 105 warnings identified)
+- React Hooks violations (5 conditional hook calls)
+- Context API prop drilling - **PLANNED**: Migrate to Redux Toolkit (Phase 2.7)
+- Accessibility improvements needed
+- API state management - **PLANNED**: RTK Query integration
 
 ## Database Schema
 

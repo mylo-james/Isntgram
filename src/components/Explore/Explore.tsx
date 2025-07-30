@@ -25,11 +25,13 @@ const Explore: React.FC = () => {
     const queryLower = encodeURIComponent(e.target.value.toLowerCase());
 
     try {
-      const { results } = await apiCall(`/api/search?query=${queryLower}`);
+      const { results } = (await apiCall(
+        `/api/search?query=${queryLower}`
+      )) as { results: SearchResult[] };
 
       setQueryRes(results);
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // console.error(e);
     }
   };
 

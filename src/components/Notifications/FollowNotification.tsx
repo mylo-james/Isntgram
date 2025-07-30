@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect, CSSProperties } from 'react';
 import { ProfileContext } from '../../Contexts';
 import { useUser } from '../../hooks/useContexts';
 import { apiCall } from '../../utils/apiMiddleware';
+import { Post, Follow } from '../../types';
 
 interface FollowNotificationProps {
   style?: CSSProperties;
@@ -11,7 +12,7 @@ interface FollowNotificationProps {
     fullName: string;
     profileImageUrl: string;
   };
-  post?: any;
+  post?: Post;
 }
 
 const FollowNotification: React.FC<FollowNotificationProps> = ({
@@ -22,46 +23,47 @@ const FollowNotification: React.FC<FollowNotificationProps> = ({
   const profileContext = useContext(ProfileContext);
   const [followingList, setFollowingList] = useState<number[]>([]);
 
-  // Handle undefined context
+  // All hooks must be called before any conditional returns
+  useEffect(() => {
+    if (!profileContext?.profileData) {
+      return;
+    }
+    const resFollowingList =
+      profileContext.profileData.following?.map((followingEntry: Follow) => {
+        return followingEntry.userFollowedId;
+      }) ?? [];
+    setFollowingList(resFollowingList);
+  }, [profileContext?.profileData]);
+
+  // Handle undefined context after all hooks are called
   if (!profileContext) {
     return null;
   }
 
   const { profileData, setProfileData } = profileContext;
 
-  useEffect(() => {
-    if (!profileData) {
-      return;
-    }
-    const resFollowingList =
-      profileData.following?.map((followingEntry: any) => {
-        return followingEntry.userFollowedId;
-      }) || [];
-    setFollowingList(resFollowingList);
-  }, [profileData, setFollowingList]);
-
   const followUser = async () => {
     if (!currentUser?.id) return;
 
     const body = { userId: currentUser.id, userFollowedId: user.id };
     try {
-      const response = await apiCall('/api/follow', {
+      const response = (await apiCall('/api/follow', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
-      });
+      })) as Follow;
 
-      const updatesList = [...(profileData?.following || []), response];
+      const updatesList = [...(profileData?.following ?? []), response];
       if (profileData) {
         setProfileData({
           ...profileData,
           following: updatesList,
         });
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // console.error(e);
     }
   };
 
@@ -70,18 +72,18 @@ const FollowNotification: React.FC<FollowNotificationProps> = ({
 
     const body = { userId: currentUser.id, userFollowedId: user.id };
     try {
-      const response = await apiCall('/api/follow', {
+      const response = (await apiCall('/api/follow', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
-      });
+      })) as { userFollowedId: number };
 
       const { userFollowedId: deletedId } = response;
 
-      const filteredList = (profileData?.following || []).filter(
-        (user: any) => user.userFollowedId !== deletedId
+      const filteredList = (profileData?.following ?? []).filter(
+        (user: Follow) => user.userFollowedId !== deletedId
       );
       if (profileData) {
         setProfileData({
@@ -89,8 +91,8 @@ const FollowNotification: React.FC<FollowNotificationProps> = ({
           following: filteredList,
         });
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // console.error(e);
     }
   };
 

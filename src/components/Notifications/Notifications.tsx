@@ -6,13 +6,14 @@ import CommentNotification from './CommentNotification';
 import FollowNotification from './FollowNotification';
 import LikeNotification from './LikeNotification';
 import { apiCall } from '../../utils/apiMiddleware';
+import { Post, User } from '../../types';
 
 interface Notification {
   id: number;
   type: 'comment' | 'follow' | 'like';
   likeableType?: string;
-  post?: any;
-  user?: any;
+  post?: Post;
+  user?: User;
 }
 
 const Notifications: React.FC = () => {
@@ -35,11 +36,13 @@ const Notifications: React.FC = () => {
     }
     (async () => {
       try {
-        const data = await apiCall(`/api/profile/${currentUser.id}`);
+        const data = (await apiCall(
+          `/api/profile/${currentUser.id}`
+        )) as typeof profileData;
 
         setProfileData?.(data);
-      } catch (e) {
-        console.error(e);
+      } catch {
+        // console.error(e);
       }
     })();
   }, [currentUser?.id, setProfileData]);
@@ -57,55 +60,80 @@ const Notifications: React.FC = () => {
     }
     (async () => {
       try {
-        const response = await apiCall(
+        const response = (await apiCall(
           `/api/note/${currentUser.id}/scroll/${toRender.length}`
-        );
+        )) as { notes: Notification[] };
 
-        const { notes }: { notes: Notification[] } = response;
-        const nodeList = notes.map((notification, i) => {
-          const style: CSSProperties = {
-            animationDuration: `${1 + i * 0.25}s`,
-          };
+        const { notes } = response;
+        const nodeList = notes
+          .filter(
+            (notification) =>
+              notification.user?.fullName && notification.user.profileImageUrl
+          )
+          .map((notification, i) => {
+            const style: CSSProperties = {
+              animationDuration: `${1 + i * 0.25}s`,
+            };
 
-          switch (notification.type) {
-            case 'comment':
-              return (
-                <CommentNotification
-                  style={style}
-                  post={notification.post}
-                  user={notification.user}
-                  key={`${notification.type}-${notification.id}`}
-                />
-              );
-            case 'follow':
-              return (
-                <FollowNotification
-                  style={style}
-                  post={notification.post}
-                  user={notification.user}
-                  key={`${notification.type}-${notification.id}`}
-                />
-              );
-            default:
-              return (
-                <LikeNotification
-                  type={notification.likeableType}
-                  style={style}
-                  post={notification.post}
-                  user={notification.user}
-                  key={`${notification.type}}-${notification.id}`}
-                />
-              );
-          }
-        });
+            // Create proper user object for the components (already filtered for these properties)
+            if (!notification.user) return null;
+            const notificationUser = notification.user;
+            const user = {
+              id: notificationUser.id,
+              username: notificationUser.username ?? '',
+              fullName: notificationUser.fullName ?? '',
+              profileImageUrl: notificationUser.profileImageUrl ?? '',
+            };
+
+            switch (notification.type) {
+              case 'comment':
+                if (!notification.post) return null;
+                return (
+                  <CommentNotification
+                    style={style}
+                    post={{
+                      id: notification.post.id,
+                      imageUrl: notification.post.imageUrl,
+                      caption: notification.post.caption,
+                    }}
+                    user={user}
+                    key={`${notification.type}-${notification.id}`}
+                  />
+                );
+              case 'follow':
+                return (
+                  <FollowNotification
+                    style={style}
+                    user={user}
+                    key={`${notification.type}-${notification.id}`}
+                  />
+                );
+              default:
+                if (!notification.post) return null;
+                return (
+                  <LikeNotification
+                    type={notification.likeableType}
+                    style={style}
+                    post={{
+                      id: notification.post.id,
+                      imageUrl: notification.post.imageUrl,
+                      caption: notification.post.caption,
+                    }}
+                    user={user}
+                    key={`${notification.type}}-${notification.id}`}
+                  />
+                );
+            }
+          })
+          .filter((node): node is React.ReactElement => node !== null);
 
         setToRender([...toRender, ...nodeList]);
 
         if (notes.length < 20) {
           setHasMore(false);
         }
-      } catch (e) {
-        console.error(e);
+      } catch {
+        // console.error(e);
       }
     })();
   };

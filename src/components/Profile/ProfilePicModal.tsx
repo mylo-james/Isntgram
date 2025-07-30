@@ -34,10 +34,10 @@ const ProfilePicModal: React.FC<ProfilePicModalProps> = ({
       return;
     }
     try {
-      const response = await apiCall(`/api/aws/${currentUser.id}`, {
+      const response = (await apiCall(`/api/aws/${currentUser.id}`, {
         method: 'POST',
         body: formData,
-      });
+      })) as { img: string };
 
       const { img } = response;
 
@@ -50,8 +50,8 @@ const ProfilePicModal: React.FC<ProfilePicModalProps> = ({
       setCurrentUser(
         currentUser ? { ...currentUser, profileImageUrl: img } : null
       );
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // console.error(e);
     }
   };
 
@@ -81,8 +81,8 @@ const ProfilePicModal: React.FC<ProfilePicModalProps> = ({
         profileData ? { ...profileData, profileImageUrl: undefined } : null
       );
       closeModal();
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // console.error(e);
     }
   };
 
@@ -114,6 +114,14 @@ const ProfilePicModal: React.FC<ProfilePicModalProps> = ({
         </div>
         <div
           onClick={removeProfilePic}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              removeProfilePic();
+            }
+          }}
+          role='button'
+          tabIndex={0}
           className='w-full flex justify-center items-center h-12 border-t border-gray-300 text-[15px] cursor-pointer font-bold text-red-500 hover:bg-gray-50 transition-colors'
         >
           Remove Current Photo
@@ -121,6 +129,14 @@ const ProfilePicModal: React.FC<ProfilePicModalProps> = ({
         <div
           className='w-full flex justify-center items-center h-12 border-t border-gray-300 text-[15px] cursor-pointer hover:bg-gray-50 transition-colors'
           onClick={() => closeModal()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              closeModal();
+            }
+          }}
+          role='button'
+          tabIndex={0}
         >
           Cancel
         </div>

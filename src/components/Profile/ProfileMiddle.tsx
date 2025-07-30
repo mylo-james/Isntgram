@@ -6,14 +6,15 @@ import { useProfile } from '../../hooks/useContexts';
 const ProfileMiddle: React.FC = () => {
   const { profileData } = useProfile();
 
+  // All hooks must be called before conditional returns
+  const [isFollowersOpen, setIsFollowersOpen] = useState<boolean>(false);
+  const [isFollowingOpen, setIsFollowingOpen] = useState<boolean>(false);
+
   if (!profileData) {
     return null;
   }
 
-  const numPosts = profileData.posts?.length || 0;
-
-  const [isFollowersOpen, setIsFollowersOpen] = useState<boolean>(false);
-  const [isFollowingOpen, setIsFollowingOpen] = useState<boolean>(false);
+  const numPosts = profileData.posts?.length ?? 0;
 
   const closeFollowersModal = () => {
     setIsFollowersOpen(false);
@@ -50,18 +51,34 @@ const ProfileMiddle: React.FC = () => {
         <div
           className='flex flex-col items-center cursor-pointer sm:hidden'
           onClick={() => setIsFollowersOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setIsFollowersOpen(true);
+            }
+          }}
+          role='button'
+          tabIndex={0}
         >
           <div className='font-bold text-sm'>
-            {profileData.followers?.length || 0}
+            {profileData.followers?.length ?? 0}
           </div>
           <div className='text-sm text-gray-400'>followers</div>
         </div>
         <div
           className='flex flex-col items-center cursor-pointer sm:hidden'
           onClick={() => setIsFollowingOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setIsFollowingOpen(true);
+            }
+          }}
+          role='button'
+          tabIndex={0}
         >
           <div className='font-bold text-sm'>
-            {profileData.following?.length || 0}
+            {profileData.following?.length ?? 0}
           </div>
           <div className='text-sm text-gray-400'>following</div>
         </div>

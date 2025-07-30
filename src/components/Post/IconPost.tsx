@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useLikes, usePosts, useUser } from '../../hooks/useContexts';
 import { toast } from 'react-toastify';
 import { apiCall } from '../../utils/apiMiddleware';
+import { Like } from '../../types';
 
 interface IconPostProps {
   id: number;
@@ -25,13 +26,13 @@ const IconPost: React.FC<IconPostProps> = ({ id: postId, isSinglePost }) => {
         id: postId,
         likeableType: 'post',
       };
-      const { like, likeList } = await apiCall('/api/like', {
+      const { like, likeList } = (await apiCall('/api/like', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
-      });
+      })) as { like: Like; likeList: Like[] };
 
       // Note: This may need adjustment based on actual likes context structure
       if (likes && setLikes) {
@@ -52,8 +53,8 @@ const IconPost: React.FC<IconPostProps> = ({ id: postId, isSinglePost }) => {
       }));
 
       toast.info('Liked post!', { autoClose: 1500 });
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // console.error(e);
     }
   };
 
@@ -81,8 +82,8 @@ const IconPost: React.FC<IconPostProps> = ({ id: postId, isSinglePost }) => {
 
       setPosts((posts) => {
         const newPost = { ...posts[postId] };
-        const filtered = (newPost.likes || []).filter(
-          (ele: any) => ele.id !== postId
+        const filtered = (newPost.likes ?? []).filter(
+          (ele: Like) => ele.id !== postId
         );
         return {
           ...posts,
@@ -91,8 +92,8 @@ const IconPost: React.FC<IconPostProps> = ({ id: postId, isSinglePost }) => {
       });
 
       toast.info('Unliked post!', { autoClose: 1500 });
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // console.error(e);
     }
   };
 

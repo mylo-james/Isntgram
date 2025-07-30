@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Post from '../components/Post/Post';
 import { useUser, useFollows, usePosts } from '../hooks/useContexts';
@@ -15,23 +15,16 @@ const Home: React.FC = () => {
   const [feedPosts, setFeedPosts] = useState<React.ReactNode[]>([]);
   const [hasMore, setHasMore] = useState<boolean>(true);
 
-  // Initial load effect
-  useEffect(() => {
-    if (currentUser?.id && follows.size > 0 && !postOrder.size) {
-      loadMore();
-    }
-  }, [currentUser?.id, follows.size]);
-
-  const loadMore = (): void => {
+  const loadMore = useCallback((): void => {
     if (!currentUser?.id) {
       return;
     }
 
     (async () => {
       try {
-        const { posts: newPosts } = await apiCall(
+        const { posts: newPosts } = (await apiCall(
           `/api/post/${currentUser.id}/scroll/${postOrder.size}`
-        );
+        )) as { posts: PostType[] };
 
         const obj = newPosts.reduce(
           (
@@ -56,11 +49,18 @@ const Home: React.FC = () => {
           }
           return newOrder;
         });
-      } catch (error) {
-        console.error(error);
+      } catch {
+        // console.error(error);
       }
     })();
-  };
+  }, [currentUser?.id, postOrder.size, setPosts, setPostOrder]);
+
+  // Initial load effect
+  useEffect(() => {
+    if (currentUser?.id && follows.size > 0 && !postOrder.size) {
+      loadMore();
+    }
+  }, [currentUser?.id, follows.size, loadMore, postOrder.size]);
 
   useEffect(() => {
     if (!postOrder.size) {
@@ -70,9 +70,20 @@ const Home: React.FC = () => {
     const nodeList: React.ReactNode[] = [];
 
     postOrder.forEach((postId) => {
-      if (posts[postId]) {
+      const post = posts[postId];
+      if (post?.user) {
+        const postForComponent = {
+          ...post,
+          user: {
+            id: post.user.id,
+            username: post.user.username ?? '',
+            profileImageUrl: post.user.profileImageUrl ?? '',
+          },
+          comments: post.comments ?? [],
+          likes: post.likes ?? [],
+        };
         nodeList.push(
-          <Post key={`feedPost-${postId}`} post={posts[postId] as any} />
+          <Post key={`feedPost-${postId}`} post={postForComponent} />
         );
       }
     });

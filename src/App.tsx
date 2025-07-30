@@ -1,18 +1,19 @@
-import { useCallback, useEffect, useState } from "react";
-import "./index.css";
-import "react-toastify/dist/ReactToastify.css";
-import { Routes, Route, BrowserRouter } from "react-router-dom";
-import { ProtectedRoute, AuthRoute } from "./Routes";
-import Home from "./Pages/Home";
-import Profile from "./Pages/Profile";
-import Explore from "./components/Explore/Explore";
-import Login from "./components/Login/Login";
-import Notifications from "./components/Notifications/Notifications";
-import EditProfile from "./components/Profile/EditProfile";
-import SinglePost from "./Pages/SinglePost";
-import Upload from "./components/Upload/Upload";
-import { useUser, useFollows, useLikes } from "./hooks/useContexts";
-import { apiCall } from "./utils/apiMiddleware";
+import { useCallback, useEffect, useState } from 'react';
+import './index.css';
+import 'react-toastify/dist/ReactToastify.css';
+import { Routes, Route, BrowserRouter } from 'react-router-dom';
+import { ProtectedRoute, AuthRoute } from './Routes';
+import Home from './Pages/Home';
+import Profile from './Pages/Profile';
+import Explore from './components/Explore/Explore';
+import Login from './components/Login/Login';
+import Notifications from './components/Notifications/Notifications';
+import EditProfile from './components/Profile/EditProfile';
+import SinglePost from './Pages/SinglePost';
+import Upload from './components/Upload/Upload';
+import { useUser, useFollows, useLikes } from './hooks/useContexts';
+import { apiCall } from './utils/apiMiddleware';
+import { User } from './types';
 
 function App() {
   const { currentUser, setCurrentUser } = useUser();
@@ -26,18 +27,18 @@ function App() {
     }
 
     try {
-      const { follows } = await apiCall(
+      const response = (await apiCall(
         `/api/follow/${currentUser.id}/following`
-      );
+      )) as { follows: Array<{ userFollowedId: number }> };
 
       const followsSet = new Set<number>(
-        follows.map(
+        response.follows.map(
           (follow: { userFollowedId: number }) => follow.userFollowedId
         )
       );
       setFollows(followsSet);
-    } catch (error) {
-      console.error("Error fetching follows:", error);
+    } catch {
+      // console.error('Error fetching follows:', error);
     }
   }, [currentUser?.id, setFollows]);
 
@@ -47,10 +48,27 @@ function App() {
     }
 
     try {
-      const { likes } = await apiCall(`/api/like/user/${currentUser.id}`);
+      const likesResponse = (await apiCall(
+        `/api/like/user/${currentUser.id}`
+      )) as {
+        likes: Array<{
+          likeableType: string;
+          likeableId: number;
+          id: number;
+          userId: number;
+        }>;
+      };
 
-      const likesRecord: Record<string, any> = {};
-      likes.forEach(
+      const likesRecord: Record<
+        string,
+        {
+          id: number;
+          userId: number;
+          postId?: number;
+          commentId?: number;
+        }
+      > = {};
+      likesResponse.likes.forEach(
         (like: {
           likeableType: string;
           likeableId: number;
@@ -61,23 +79,23 @@ function App() {
           likesRecord[key] = {
             id: like.id,
             userId: like.userId,
-            postId: like.likeableType === "post" ? like.likeableId : undefined,
+            postId: like.likeableType === 'post' ? like.likeableId : undefined,
             commentId:
-              like.likeableType === "comment" ? like.likeableId : undefined,
+              like.likeableType === 'comment' ? like.likeableId : undefined,
           };
         }
       );
       setLikes(likesRecord);
-    } catch (error) {
-      console.error("Error fetching likes:", error);
+    } catch {
+      // console.error('Error fetching likes:', error);
     }
   }, [currentUser?.id, setLikes]);
 
   const authenticateUser = useCallback(async (): Promise<void> => {
     try {
-      const user = await apiCall("/api/auth/");
-      setCurrentUser(user);
-    } catch (error) {
+      const user = await apiCall('/api/auth/');
+      setCurrentUser(user as User);
+    } catch {
       // Error means user is not authenticated, which is fine
     } finally {
       setLoaded(true);
@@ -101,34 +119,34 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="App">
-        <div id="background" />
+      <div className='App'>
+        <div id='background' />
         <Routes>
           <Route
-            path="/auth/*"
+            path='/auth/*'
             element={
               <AuthRoute>
                 <Routes>
                   <Route index element={<Login />} />
-                  <Route path="login" element={<Login />} />
-                  <Route path="signup" element={<Login />} />
+                  <Route path='login' element={<Login />} />
+                  <Route path='signup' element={<Login />} />
                 </Routes>
               </AuthRoute>
             }
           />
 
           <Route
-            path="/*"
+            path='/*'
             element={
               <ProtectedRoute>
                 <Routes>
                   <Route index element={<Home />} />
-                  <Route path="profile/:username" element={<Profile />} />
-                  <Route path="explore" element={<Explore />} />
-                  <Route path="notifications" element={<Notifications />} />
-                  <Route path="accounts/edit" element={<EditProfile />} />
-                  <Route path="post/:postId" element={<SinglePost />} />
-                  <Route path="upload" element={<Upload />} />
+                  <Route path='profile/:username' element={<Profile />} />
+                  <Route path='explore' element={<Explore />} />
+                  <Route path='notifications' element={<Notifications />} />
+                  <Route path='accounts/edit' element={<EditProfile />} />
+                  <Route path='post/:postId' element={<SinglePost />} />
+                  <Route path='upload' element={<Upload />} />
                 </Routes>
               </ProtectedRoute>
             }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Comment, Like } from '../../types';
 import PostHeader from './PostHeader';
 import PhotoImagePost from './PhotoImagePost';
 import IconPost from './IconPost';
@@ -16,15 +17,15 @@ interface PostProps {
     };
     caption: string;
     createdAt: string;
-    comments: any[];
-    likes: any[];
+    comments: unknown[];
+    likes: unknown[];
     isSinglePost?: boolean;
     // Add other post properties as needed
   };
 }
 
 const Post: React.FC<PostProps> = ({ post, post: { id, imageUrl } }) => {
-  const isSinglePost = post.isSinglePost || false;
+  const isSinglePost = post.isSinglePost ?? false;
 
   return (
     <div className='flex flex-col'>
@@ -32,7 +33,12 @@ const Post: React.FC<PostProps> = ({ post, post: { id, imageUrl } }) => {
         <PostHeader {...post} />
         <PhotoImagePost id={id} postImg={imageUrl} />
         <IconPost id={id} isSinglePost={isSinglePost} />
-        <PostCommentSection {...post} isSinglePost={isSinglePost} />
+        <PostCommentSection
+          {...post}
+          comments={post.comments as Comment[]}
+          likes={post.likes as Like[]}
+          isSinglePost={isSinglePost}
+        />
         <CommentInputField id={id} isSinglePost={isSinglePost} />
       </div>
     </div>

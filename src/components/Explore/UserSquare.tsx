@@ -28,7 +28,7 @@ const UserSquare: React.FC<UserSquareProps> = ({ result }) => {
           className={`result-${result.id} h-auto w-[calc(95vw/3)] max-w-[calc(614px/3)] object-cover p-[0.5vw] animate-fadeIn`}
           draggable={false}
           src={
-            result.profileImageUrl ||
+            result.profileImageUrl ??
             'https://miro.medium.com/max/720/1*W35QUSvGpcLuxPo3SRTH4w.png'
           }
           alt={result.fullName}

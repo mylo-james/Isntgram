@@ -6,46 +6,48 @@ export const api = {
   // User endpoints
   async getCurrentUser(): Promise<APIResponse<User>> {
     try {
-      const data = await apiCall('/api/auth/me');
+      const data = (await apiCall('/api/auth/me')) as User;
       return { data };
-    } catch (error) {
+    } catch {
       return { error: 'Failed to fetch current user' };
     }
   },
 
   async login(username: string, password: string): Promise<APIResponse<User>> {
     try {
-      const data = await apiCall('/api/auth/login', {
+      const data = (await apiCall('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ username, password }),
-      });
+      })) as User;
       return { data };
-    } catch (error) {
+    } catch {
       return { error: 'Network error during login' };
     }
   },
 
   // Post endpoints
-  async getPosts(offset: number = 0): Promise<APIResponse<Post[]>> {
+  async getPosts(offset = 0): Promise<APIResponse<Post[]>> {
     try {
-      const data = await apiCall(`/api/post/scroll/${offset}`);
-      return { data: data.posts || [] };
-    } catch (error) {
+      const data = (await apiCall(`/api/post/scroll/${offset}`)) as {
+        posts: Post[];
+      };
+      return { data: data.posts ?? [] };
+    } catch {
       return { error: 'Failed to fetch posts' };
     }
   },
 
   async createPost(formData: FormData): Promise<APIResponse<Post>> {
     try {
-      const data = await apiCall('/api/post/', {
+      const data = (await apiCall('/api/post/', {
         method: 'POST',
         body: formData,
-      });
+      })) as Post;
       return { data };
-    } catch (error) {
+    } catch {
       return { error: 'Network error during post creation' };
     }
   },
@@ -56,7 +58,7 @@ export const api = {
     likeableType: 'post' | 'comment'
   ): Promise<APIResponse<{ liked: boolean }>> {
     try {
-      const data = await apiCall('/api/like/', {
+      const data = (await apiCall('/api/like/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -65,9 +67,9 @@ export const api = {
           likeableId: likeableId,
           likeableType: likeableType,
         }),
-      });
+      })) as { liked: boolean };
       return { data: { liked: data.liked } };
-    } catch (error) {
+    } catch {
       return { error: 'Network error during like toggle' };
     }
   },

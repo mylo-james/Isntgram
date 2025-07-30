@@ -39,8 +39,8 @@ const RegisterForm: React.FC = () => {
       });
 
       window.location.reload();
-    } catch (error) {
-      console.error('Registration error:', error);
+    } catch {
+      // console.error('Registration error:', error);
       showErrors(['An error occurred during registration']);
     }
   };

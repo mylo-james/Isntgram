@@ -7,7 +7,7 @@ interface CaptionProps {
   caption: string;
 }
 
-const Caption: React.FC<CaptionProps> = ({ userId, username, caption }) => {
+const Caption: React.FC<CaptionProps> = ({ username, caption }) => {
   return (
     <div className='sm:pt-1.5'>
       <Link to={`/profile/${username}`} className='font-bold pr-2'>

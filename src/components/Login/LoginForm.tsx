@@ -25,8 +25,8 @@ const LoginForm: React.FC = () => {
       });
 
       window.location.reload();
-    } catch (error) {
-      console.error('Login error:', error);
+    } catch {
+      // console.error('Login error:', error);
       showErrors(['An error occurred during login']);
     }
   };
@@ -44,8 +44,8 @@ const LoginForm: React.FC = () => {
       });
 
       window.location.reload();
-    } catch (error) {
-      console.error('Demo login error:', error);
+    } catch {
+      // console.error('Demo login error:', error);
       showErrors(['An error occurred during demo login']);
     }
   };

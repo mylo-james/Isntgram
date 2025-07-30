@@ -85,36 +85,36 @@ export interface PaginatedResponse<T> {
 // Context Types
 export interface UserContextType {
   currentUser: User | null;
-  setCurrentUser: (user: User | null) => void;
+  setCurrentUser: (_user: User | null) => void;
   isAuthenticated: boolean;
 }
 
 export interface PostsContextType {
   posts: Post[];
-  setPosts: (posts: Post[]) => void;
-  addPost: (post: Post) => void;
-  updatePost: (postId: number, updatedPost: Partial<Post>) => void;
-  deletePost: (postId: number) => void;
+  setPosts: (_posts: Post[]) => void;
+  addPost: (_post: Post) => void;
+  updatePost: (_postId: number, _updatedPost: Partial<Post>) => void;
+  deletePost: (_postId: number) => void;
 }
 
 export interface LikeContextType {
   likedPosts: Set<number>;
   likedComments: Set<number>;
-  togglePostLike: (postId: number) => void;
-  toggleCommentLike: (commentId: number) => void;
+  togglePostLike: (_postId: number) => void;
+  toggleCommentLike: (_commentId: number) => void;
 }
 
 export interface ProfileContextType {
   profileUser: User | null;
-  setProfileUser: (user: User | null) => void;
+  setProfileUser: (_user: User | null) => void;
   isLoading: boolean;
-  setIsLoading: (loading: boolean) => void;
+  setIsLoading: (_loading: boolean) => void;
 }
 
 export interface FollowContextType {
   followingUsers: Set<number>;
-  toggleFollow: (userId: number) => void;
-  isFollowing: (userId: number) => boolean;
+  toggleFollow: (_userId: number) => void;
+  isFollowing: (_userId: number) => boolean;
 }
 
 // Form Types
@@ -139,23 +139,5 @@ export interface CommentFormData {
   content: string;
 }
 
-// Component Props Types
-export interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-}
-
-export interface LoadingProps {
-  size?: 'small' | 'medium' | 'large';
-  color?: string;
-}
-
-export interface InfiniteScrollProps {
-  hasMore: boolean;
-  loadMore: () => void;
-  children: React.ReactNode;
-}
-
 // Re-export component types for convenience
-export * from './components';
+// export * from './components'; // Removed - unused interfaces

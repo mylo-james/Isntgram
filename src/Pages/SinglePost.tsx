@@ -20,13 +20,15 @@ const SinglePost: React.FC = () => {
     (async () => {
       setIsLoaded(false);
       try {
-        const response = await apiCall(`/api/post/${postId}`);
+        const response = (await apiCall(`/api/post/${postId}`)) as {
+          post: Post;
+        };
 
-        const { post }: { post: Post } = response;
+        const { post } = response;
         setPosts((currentPosts) => ({ ...currentPosts, [post.id]: post }));
         setIsLoaded(true);
-      } catch (error) {
-        console.error(error);
+      } catch {
+        // console.error(error);
       }
     })();
   }, [postId, setPosts]);
@@ -41,7 +43,7 @@ const SinglePost: React.FC = () => {
 
   const post = posts[parseInt(postId)];
 
-  if (!post) {
+  if (!post?.user) {
     return (
       <div className='flex justify-center items-center min-h-screen'>
         <div className='text-gray-500'>Post not found</div>
@@ -51,11 +53,29 @@ const SinglePost: React.FC = () => {
 
   return (
     <div className='w-full max-w-[600px] my-14 mx-auto bg-white border-t border-gray-300 sm:border sm:border-gray-300 sm:mt-20 sm:rounded-sm'>
-      <PostHeader {...(post as any)} isSinglePost={true} />
-      <PhotoImagePost id={parseInt(postId)} postImg={(post as any).imageUrl} />
-      <IconPost isSinglePost={true} {...(post as any)} />
-      <PostCommentSection {...(post as any)} isSinglePost={true} />
-      <CommentInputField {...(post as any)} isSinglePost={true} />
+      <PostHeader
+        id={post.id}
+        user={{
+          id: post.user.id,
+          profileImageUrl: post.user.profileImageUrl ?? '',
+          username: post.user.username ?? '',
+        }}
+      />
+      <PhotoImagePost id={parseInt(postId)} postImg={post.imageUrl} />
+      <IconPost isSinglePost={true} {...post} />
+      <PostCommentSection
+        id={post.id}
+        user={{
+          id: post.user.id,
+          username: post.user.username ?? '',
+        }}
+        comments={post.comments ?? []}
+        createdAt={post.createdAt}
+        isSinglePost={true}
+        likes={post.likes ?? []}
+        caption={post.caption}
+      />
+      <CommentInputField id={post.id} isSinglePost={true} />
     </div>
   );
 };

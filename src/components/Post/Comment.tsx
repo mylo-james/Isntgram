@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { RiHeartLine } from 'react-icons/ri';
 import { useLikes, usePosts, useUser } from '../../hooks/useContexts';
 import { toast } from 'react-toastify';
+import { Like } from '../../types';
 import { apiCall } from '../../utils/apiMiddleware';
 
 interface CommentProps {
@@ -13,13 +14,7 @@ interface CommentProps {
   id: number;
 }
 
-const Comment: React.FC<CommentProps> = ({
-  username,
-  content,
-  postId,
-  userId,
-  id,
-}) => {
+const Comment: React.FC<CommentProps> = ({ username, content, postId, id }) => {
   const { currentUser } = useUser();
   const { likes, setLikes } = useLikes();
   const { setPosts } = usePosts();
@@ -33,17 +28,17 @@ const Comment: React.FC<CommentProps> = ({
       id,
     };
     try {
-      const { like } = await apiCall('/api/like', {
+      const { like } = (await apiCall('/api/like', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
-      });
+      })) as { like: Like };
       setLikes({ ...likes, [`comment-${id}`]: like });
       toast.info('Liked comment!', { autoClose: 1500 });
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // console.error(e);
     }
   };
 
@@ -66,8 +61,8 @@ const Comment: React.FC<CommentProps> = ({
 
       setPosts((posts) => {
         const newPost = { ...posts[postId] };
-        const filtered = (newPost.likes || []).filter(
-          (ele: any) => ele.id !== like.id
+        const filtered = (newPost.likes ?? []).filter(
+          (ele: Like) => ele.id !== like.id
         );
         return {
           ...posts,
@@ -76,8 +71,8 @@ const Comment: React.FC<CommentProps> = ({
       });
 
       toast.info('Unliked comment!', { autoClose: 1500 });
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // console.error(e);
     }
   };
 

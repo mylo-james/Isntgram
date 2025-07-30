@@ -5,6 +5,7 @@ import Nav from '../Nav';
 import { toast } from 'react-toastify';
 import ProfilePicModal from './ProfilePicModal';
 import { apiCall } from '../../utils/apiMiddleware';
+import { User } from '../../types';
 
 const EditProfile: React.FC = () => {
   const [username, setUsername] = useState<string>('');
@@ -31,9 +32,9 @@ const EditProfile: React.FC = () => {
       return;
     }
     setUsername(profileData.username);
-    setEmail(profileData.email || '');
-    setFullName(profileData.fullName || '');
-    setBio(profileData.bio || '');
+    setEmail(profileData.email ?? '');
+    setFullName(profileData.fullName ?? '');
+    setBio(profileData.bio ?? '');
   }, [profileData]);
 
   if (!currentUser?.id) {
@@ -74,21 +75,22 @@ const EditProfile: React.FC = () => {
     const data = { id: currentUser?.id, username, email, fullName, bio };
 
     try {
-      const user = await apiCall('/api/user', {
+      const user = (await apiCall('/api/user', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
-      });
+      })) as User;
 
       setCurrentUser(user);
       toast.success('Profile updated!', {
         autoClose: 3000,
         closeOnClick: true,
       });
-    } catch (error: any) {
-      const errorMessage = error.message || 'Failed to update profile';
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to update profile';
       toast.error(errorMessage, {
         autoClose: 3000,
         closeOnClick: true,
@@ -106,6 +108,14 @@ const EditProfile: React.FC = () => {
         <div className='flex w-full'>
           <img
             onClick={changeProfilePic}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                changeProfilePic();
+              }
+            }}
+            role='button'
+            tabIndex={0}
             className='w-[45px] h-auto rounded-full cursor-pointer object-cover'
             src={currentUser?.profileImageUrl}
             alt='profile-pic'
@@ -114,6 +124,14 @@ const EditProfile: React.FC = () => {
             <div className='text-xl'>{username}</div>
             <div
               onClick={changeProfilePic}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  changeProfilePic();
+                }
+              }}
+              role='button'
+              tabIndex={0}
               className='text-sm font-bold text-blue-500 cursor-pointer hover:text-blue-600 transition-colors'
             >
               Change Profile Photo

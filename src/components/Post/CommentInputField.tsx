@@ -1,6 +1,7 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { usePosts, useUser } from '../../hooks/useContexts';
 import { apiCall } from '../../utils/apiMiddleware';
+import { Comment } from '../../types';
 
 interface CommentInputFieldProps {
   id: number;
@@ -25,14 +26,14 @@ const CommentInputField: React.FC<CommentInputFieldProps> = ({
       return;
     }
     const data = { content, userId: currentUser.id, postId };
-    const comment = await apiCall(`/api/comment`, {
+    const comment = (await apiCall(`/api/comment`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
-    });
+    })) as Comment;
     setPosts((posts) => {
       const currentPost = posts[postId];
-      const commentList = [...(currentPost.comments || []), comment];
+      const commentList = [...(currentPost.comments ?? []), comment];
       return {
         ...posts,
         [postId]: { ...currentPost, comments: commentList },

@@ -1,10 +1,10 @@
-import js from "@eslint/js";
-import reactHooks from "eslint-plugin-react-hooks";
-import jsxA11y from "eslint-plugin-jsx-a11y";
-import prettier from "eslint-plugin-prettier";
-import prettierConfig from "eslint-config-prettier";
-import globals from "globals";
-import tseslint from "typescript-eslint";
+import js from '@eslint/js';
+import reactHooks from 'eslint-plugin-react-hooks';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
+import prettier from 'eslint-plugin-prettier';
+import prettierConfig from 'eslint-config-prettier';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 export default [
   // Base configuration
@@ -13,10 +13,10 @@ export default [
 
   // Files to lint
   {
-    files: ["src/**/*.{js,jsx,ts,tsx}"],
+    files: ['src/**/*.{js,jsx,ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2021,
-      sourceType: "module",
+      sourceType: 'module',
       parser: tseslint.parser,
       globals: {
         ...globals.browser,
@@ -27,22 +27,22 @@ export default [
         ecmaFeatures: {
           jsx: true,
         },
-        project: "./tsconfig.json",
+        project: './tsconfig.json',
       },
     },
     plugins: {
-      "react-hooks": reactHooks,
-      "jsx-a11y": jsxA11y,
+      'react-hooks': reactHooks,
+      'jsx-a11y': jsxA11y,
       prettier,
-      "@typescript-eslint": tseslint.plugin,
+      '@typescript-eslint': tseslint.plugin,
     },
     rules: {
       // Prettier integration
-      "prettier/prettier": [
-        "error",
+      'prettier/prettier': [
+        'error',
         {
           singleQuote: true,
-          trailingComma: "es5",
+          trailingComma: 'es5',
           tabWidth: 2,
           semi: true,
           printWidth: 80,
@@ -51,48 +51,65 @@ export default [
       ],
 
       // Code style
-      quotes: ["error", "single", { avoidEscape: true }],
+      quotes: ['error', 'single', { avoidEscape: true }],
 
       // React Hooks rules
-      "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "warn",
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
 
       // General JavaScript rules
-      "no-console": "warn",
-      "no-unused-vars": [
-        "warn",
+      'no-console': 'warn',
+      'no-unused-vars': [
+        'warn',
         {
-          argsIgnorePattern: "^_",
-          varsIgnorePattern: "^_",
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
         },
       ],
-      "no-var": "error",
-      "prefer-const": "error",
-      "prefer-arrow-callback": "warn",
-      "prefer-template": "warn",
+      'no-var': 'error',
+      'prefer-const': 'error',
+      'prefer-arrow-callback': 'warn',
+      'prefer-template': 'warn',
 
       // Accessibility rules
-      "jsx-a11y/anchor-is-valid": [
-        "error",
+      'jsx-a11y/anchor-is-valid': [
+        'error',
         {
-          components: ["Link"],
-          specialLink: ["to"],
+          components: ['Link'],
+          specialLink: ['to'],
         },
       ],
-      "jsx-a11y/click-events-have-key-events": "warn",
-      "jsx-a11y/no-static-element-interactions": "warn",
+      'jsx-a11y/click-events-have-key-events': 'warn',
+      'jsx-a11y/no-static-element-interactions': 'warn',
 
       // Code quality
-      eqeqeq: ["error", "always"],
-      curly: ["error", "all"],
-      "no-eval": "error",
-      "no-implied-eval": "error",
-      "no-new-func": "error",
-      "no-script-url": "error",
+      eqeqeq: ['error', 'always'],
+      curly: ['error', 'all'],
+      'no-eval': 'error',
+      'no-implied-eval': 'error',
+      'no-new-func': 'error',
+      'no-script-url': 'error',
+
+      // TypeScript-specific rules (strict)
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
+      '@typescript-eslint/prefer-nullish-coalescing': 'error',
+      '@typescript-eslint/prefer-optional-chain': 'error',
+      '@typescript-eslint/no-non-null-assertion': 'warn',
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
+      '@typescript-eslint/no-inferrable-types': 'error',
+      '@typescript-eslint/prefer-as-const': 'error',
     },
     settings: {
       react: {
-        version: "detect",
+        version: 'detect',
       },
     },
   },

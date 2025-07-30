@@ -20,7 +20,7 @@ export function camelToSnake(str: string): string {
 /**
  * Recursively convert all object keys from snake_case to camelCase
  */
-export function convertKeysToCamel(obj: any): any {
+export function convertKeysToCamel(obj: unknown): unknown {
   if (obj === null || obj === undefined) {
     return obj;
   }
@@ -29,8 +29,8 @@ export function convertKeysToCamel(obj: any): any {
     return obj.map(convertKeysToCamel);
   }
 
-  if (typeof obj === 'object' && obj.constructor === Object) {
-    const converted: any = {};
+  if (typeof obj === 'object' && obj !== null && obj.constructor === Object) {
+    const converted: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(obj)) {
       const camelKey = snakeToCamel(key);
       converted[camelKey] = convertKeysToCamel(value);
@@ -44,7 +44,7 @@ export function convertKeysToCamel(obj: any): any {
 /**
  * Recursively convert all object keys from camelCase to snake_case
  */
-export function convertKeysToSnake(obj: any): any {
+export function convertKeysToSnake(obj: unknown): unknown {
   if (obj === null || obj === undefined) {
     return obj;
   }
@@ -53,8 +53,8 @@ export function convertKeysToSnake(obj: any): any {
     return obj.map(convertKeysToSnake);
   }
 
-  if (typeof obj === 'object' && obj.constructor === Object) {
-    const converted: any = {};
+  if (typeof obj === 'object' && obj !== null && obj.constructor === Object) {
+    const converted: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(obj)) {
       const snakeKey = camelToSnake(key);
       converted[snakeKey] = convertKeysToSnake(value);

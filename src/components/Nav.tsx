@@ -66,7 +66,7 @@ const Nav: React.FC = () => {
             </li>
             <li className='ml-[22px] pt-1.5'>
               <NavLink
-                to={`/profile/${currentUser?.username || currentUser?.id}`}
+                to={`/profile/${currentUser?.username ?? currentUser?.id}`}
                 className={({ isActive }) =>
                   `block ${isActive ? 'ring-2 ring-blue-500 rounded-full' : ''}`
                 }
@@ -75,7 +75,7 @@ const Nav: React.FC = () => {
                 <div className='w-6 h-6 rounded-full overflow-hidden'>
                   <img
                     className='w-full h-full object-cover'
-                    src={currentUser?.profileImageUrl || '/default-avatar.png'}
+                    src={currentUser?.profileImageUrl ?? '/default-avatar.png'}
                     alt='avatar'
                   />
                 </div>

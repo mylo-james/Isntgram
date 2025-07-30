@@ -16,7 +16,7 @@ export interface MobileNavProps {
 }
 
 export interface SearchProps {
-  onUserSelect?: (user: User) => void;
+  onUserSelect?: (_user: User) => void;
   placeholder?: string;
   className?: string;
 }
@@ -53,9 +53,9 @@ export interface SpinnerProps {
 // Post Components
 export interface PostCardProps {
   post: Post;
-  onLike?: (postId: number) => void;
-  onComment?: (postId: number) => void;
-  onDelete?: (postId: number) => void;
+  onLike?: (_postId: number) => void;
+  onComment?: (_postId: number) => void;
+  onDelete?: (_postId: number) => void;
   showActions?: boolean;
   className?: string;
 }
@@ -70,7 +70,7 @@ export interface PostImageProps {
 export interface PostHeaderProps {
   user: User;
   createdAt: string;
-  onUserClick?: (user: User) => void;
+  onUserClick?: (_user: User) => void;
   showOptions?: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
@@ -96,9 +96,9 @@ export interface PostStatsProps {
 // Comment Components
 export interface CommentProps {
   comment: Comment;
-  onLike?: (commentId: number) => void;
-  onDelete?: (commentId: number) => void;
-  onReply?: (commentId: number) => void;
+  onLike?: (_commentId: number) => void;
+  onDelete?: (_commentId: number) => void;
+  onReply?: (_commentId: number) => void;
   showReplyButton?: boolean;
   className?: string;
 }
@@ -106,15 +106,15 @@ export interface CommentProps {
 export interface CommentListProps {
   comments: Comment[];
   postId: number;
-  onCommentLike?: (commentId: number) => void;
-  onCommentDelete?: (commentId: number) => void;
+  onCommentLike?: (_commentId: number) => void;
+  onCommentDelete?: (_commentId: number) => void;
   maxVisible?: number;
   className?: string;
 }
 
 export interface CommentFormProps {
   postId: number;
-  onSubmit: (content: string) => void;
+  onSubmit: (_content: string) => void;
   placeholder?: string;
   autoFocus?: boolean;
   className?: string;
@@ -142,14 +142,14 @@ export interface ProfileStatsProps {
 
 export interface ProfileGridProps {
   posts: Post[];
-  onPostClick?: (post: Post) => void;
+  onPostClick?: (_post: Post) => void;
   columns?: number;
   className?: string;
 }
 
 // Upload Components
 export interface UploadProps {
-  onUpload: (file: File, caption: string) => void;
+  onUpload: (_file: File, _caption: string) => void;
   onCancel: () => void;
   maxFileSize?: number;
   acceptedTypes?: string[];
@@ -164,7 +164,7 @@ export interface ImagePreviewProps {
 
 export interface CaptionInputProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (_value: string) => void;
   placeholder?: string;
   maxLength?: number;
   className?: string;
@@ -173,13 +173,13 @@ export interface CaptionInputProps {
 // Explore Components
 export interface ExploreGridProps {
   posts: Post[];
-  onPostClick?: (post: Post) => void;
+  onPostClick?: (_post: Post) => void;
   className?: string;
 }
 
 export interface UserSquareProps {
   user: User;
-  onClick?: (user: User) => void;
+  onClick?: (_user: User) => void;
   size?: 'small' | 'medium' | 'large';
   showUsername?: boolean;
   className?: string;
@@ -188,19 +188,19 @@ export interface UserSquareProps {
 // Layout Components (for Explore)
 export interface Layout1Props {
   posts: Post[];
-  onPostClick?: (post: Post) => void;
+  onPostClick?: (_post: Post) => void;
   className?: string;
 }
 
 export interface Layout2Props {
   posts: Post[];
-  onPostClick?: (post: Post) => void;
+  onPostClick?: (_post: Post) => void;
   className?: string;
 }
 
 export interface Layout3Props {
   posts: Post[];
-  onPostClick?: (post: Post) => void;
+  onPostClick?: (_post: Post) => void;
   className?: string;
 }
 
@@ -215,7 +215,7 @@ export interface NotificationProps {
     createdAt: string;
     read: boolean;
   };
-  onMarkAsRead?: (notificationId: number) => void;
+  onMarkAsRead?: (_notificationId: number) => void;
   onClick?: () => void;
   className?: string;
 }
@@ -224,8 +224,8 @@ export interface LikeNotificationProps {
   user: User;
   post: Post;
   createdAt: string;
-  onUserClick?: (user: User) => void;
-  onPostClick?: (post: Post) => void;
+  onUserClick?: (_user: User) => void;
+  onPostClick?: (_post: Post) => void;
   className?: string;
 }
 
@@ -234,8 +234,8 @@ export interface CommentNotificationProps {
   post: Post;
   comment: Comment;
   createdAt: string;
-  onUserClick?: (user: User) => void;
-  onPostClick?: (post: Post) => void;
+  onUserClick?: (_user: User) => void;
+  onPostClick?: (_post: Post) => void;
   className?: string;
 }
 
@@ -243,7 +243,7 @@ export interface FollowNotificationProps {
   user: User;
   createdAt: string;
   isFollowing: boolean;
-  onUserClick?: (user: User) => void;
+  onUserClick?: (_user: User) => void;
   onFollowToggle?: () => void;
   className?: string;
 }
@@ -258,14 +258,14 @@ export interface NoFollowsProps {
 // EVENT HANDLER TYPES
 // =======================
 
-export type UserClickHandler = (user: User) => void;
-export type PostClickHandler = (post: Post) => void;
-export type CommentClickHandler = (comment: Comment) => void;
-export type LikeHandler = (id: number) => void;
-export type FollowHandler = (userId: number) => void;
-export type FormSubmitHandler<T> = (data: T) => void;
-export type FileUploadHandler = (file: File) => void;
-export type SearchHandler = (query: string) => void;
+export type UserClickHandler = (_user: User) => void;
+export type PostClickHandler = (_post: Post) => void;
+export type CommentClickHandler = (_comment: Comment) => void;
+export type LikeHandler = (_id: number) => void;
+export type FollowHandler = (_userId: number) => void;
+export type FormSubmitHandler<T> = (_data: T) => void;
+export type FileUploadHandler = (_file: File) => void;
+export type SearchHandler = (_query: string) => void;
 
 // =======================
 // UTILITY PROP TYPES
@@ -295,16 +295,8 @@ export interface FormFieldProps extends BaseComponentProps {
 // PAGE COMPONENT TYPES
 // =======================
 
-export interface HomePageProps {
-  // Props for main home/feed page
-}
-
 export interface ProfilePageProps {
   username?: string; // From URL params
-}
-
-export interface ExplorePageProps {
-  // Props for explore page
 }
 
 export interface AuthPageProps {

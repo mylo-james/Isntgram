@@ -15,14 +15,14 @@ export async function apiFetch(
   if (config.body && config.headers) {
     const contentType =
       typeof config.headers === 'object' && 'content-type' in config.headers
-        ? (config.headers as any)['content-type']
+        ? (config.headers as Record<string, string>)['content-type']
         : undefined;
 
     if (contentType?.includes('application/json')) {
       try {
         const jsonBody = JSON.parse(config.body as string);
         config.body = JSON.stringify(convertKeysToSnake(jsonBody));
-      } catch (e) {
+      } catch {
         // If JSON parsing fails, leave body unchanged
       }
     }
@@ -53,7 +53,7 @@ export async function apiFetch(
 export async function apiCall(
   url: string,
   options: RequestInit = {}
-): Promise<any> {
+): Promise<unknown> {
   const response = await apiFetch(url, options);
 
   if (!response.ok) {

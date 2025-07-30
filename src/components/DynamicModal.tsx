@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useUser } from '../hooks/useContexts';
 import { ProfileContext } from '../Contexts/profileContext';
 import { apiCall } from '../utils/apiMiddleware';
+import { Follow } from '../types';
 
 interface User {
   id: number;
@@ -33,7 +34,7 @@ const DynamicModal: React.FC<DynamicModalProps> = (props) => {
   }
 
   const { profileData, setProfileData } = profileContext;
-  const id = profileData?.id || 0;
+  const id = profileData?.id ?? 0;
 
   useEffect(() => {
     if (!currentUser?.id) {
@@ -41,14 +42,14 @@ const DynamicModal: React.FC<DynamicModalProps> = (props) => {
     }
     (async () => {
       try {
-        const { users } = await apiCall(
+        const { users } = (await apiCall(
           `/api/follow/${currentUser.id}/following`
-        );
+        )) as { users: User[] };
 
         const userIds = users.map((user: User) => user.id);
         setCurrentUserFollows(userIds);
-      } catch (e) {
-        console.error(e);
+      } catch {
+        // console.error(e);
       }
     })();
   }, [currentUser?.id]);
@@ -73,11 +74,13 @@ const DynamicModal: React.FC<DynamicModalProps> = (props) => {
     }
     (async () => {
       try {
-        const { users } = await apiCall(`/api/${endpoint}`);
+        const { users } = (await apiCall(`/api/${endpoint}`)) as {
+          users: User[];
+        };
 
         setUserArray(users);
-      } catch (e) {
-        console.error(e);
+      } catch {
+        // console.error(e);
       }
     })();
   }, [currentUserFollows, endpoint]);
@@ -91,19 +94,19 @@ const DynamicModal: React.FC<DynamicModalProps> = (props) => {
 
     const body = { userId: currentUser.id, userFollowedId };
     try {
-      const followResponse = await apiCall('/api/follow', {
+      const followResponse = (await apiCall('/api/follow', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
-      });
+      })) as Follow;
 
       setCurrentUserFollows([...currentUserFollows, userFollowedId]);
 
       if (profileData?.id === currentUser?.id) {
         const updatedFollowingList = [
-          ...(profileData.following || []),
+          ...(profileData.following ?? []),
           followResponse,
         ];
         setProfileData({
@@ -111,8 +114,8 @@ const DynamicModal: React.FC<DynamicModalProps> = (props) => {
           following: updatedFollowingList,
         });
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // console.error(e);
     }
   };
 
@@ -125,13 +128,13 @@ const DynamicModal: React.FC<DynamicModalProps> = (props) => {
 
     const body = { userId: currentUser.id, userFollowedId };
     try {
-      const { userFollowedId: id } = await apiCall('/api/follow', {
+      const { userFollowedId: id } = (await apiCall('/api/follow', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
-      });
+      })) as { userFollowedId: number };
 
       const currentUserFollowsCopy = [...currentUserFollows];
       const index = currentUserFollowsCopy.indexOf(id);
@@ -140,16 +143,16 @@ const DynamicModal: React.FC<DynamicModalProps> = (props) => {
       setCurrentUserFollows(currentUserFollowsCopy);
 
       if (profileData?.id === currentUser?.id) {
-        const updatedFollowingList = (profileData.following || []).filter(
-          (user: any) => user.userFollowedId !== id
+        const updatedFollowingList = (profileData.following ?? []).filter(
+          (user: Follow) => user.userFollowedId !== id
         );
         setProfileData({
           ...profileData,
           following: updatedFollowingList,
         });
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // console.error(e);
     }
   };
   if (!profileData) {

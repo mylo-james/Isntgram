@@ -31,11 +31,11 @@ const Layout2: React.FC<Layout2Props> = ({ componentPhotos }) => {
             <div className='absolute w-full h-full flex flex-col justify-center items-center opacity-0 group-hover:opacity-100 bg-black bg-opacity-30 overflow-hidden z-10 transition-opacity duration-300'>
               <div className='flex items-center'>
                 <RiHeartLine />
-                <div className='pl-[1vw]'>{photo.likeCount || 0}</div>
+                <div className='pl-[1vw]'>{photo.likeCount ?? 0}</div>
               </div>
               <div className='flex items-center'>
                 <FaRegComment />
-                <div className='pl-[1vw]'>{photo.commentCount || 0}</div>
+                <div className='pl-[1vw]'>{photo.commentCount ?? 0}</div>
               </div>
             </div>
             <img

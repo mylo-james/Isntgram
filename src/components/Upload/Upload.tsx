@@ -35,17 +35,20 @@ const Upload: React.FC = () => {
       formData.append('file', picture);
 
       const caption =
-        encodeURIComponent(captionInput.current?.value || '') || 'null';
+        encodeURIComponent(captionInput.current?.value ?? '') ?? 'null';
 
-      const post = await apiCall(`/api/aws/post/${currentUser.id}/${caption}`, {
-        method: 'POST',
-        body: formData,
-      });
+      const post = (await apiCall(
+        `/api/aws/post/${currentUser.id}/${caption}`,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      )) as { id: number };
 
       toast.info('Upload Success!');
       navigate(`/post/${post.id}`);
-    } catch (error) {
-      console.error('Upload error:', error);
+    } catch {
+      // console.error('Upload error:', error);
       toast.error('Upload Error. Please try again!');
     }
   };

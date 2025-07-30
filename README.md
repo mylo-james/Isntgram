@@ -50,6 +50,7 @@
 ## Development Setup
 
 ### Prerequisites
+
 * Python 3.x
 * Node.js 18+
 * PostgreSQL
@@ -89,6 +90,7 @@ npm run dev
 ```
 
 ### Services
+
 * **Backend**: <http://localhost:8080>
 * **Frontend**: <http://localhost:3000> (or next available port)
 
@@ -151,7 +153,7 @@ const fetchMore = () => {
 
   }
 
-  if (!toRender || !currentUserId) return null;
+  if (!toRender ?? !currentUserId) return null;
   return (
     <ExploreGridWrapper key="gridWrapper">
       <InfiniteScroll initialLoad={true} pageStart={4} loadMore={fetchMore} hasMore={hasMore}>

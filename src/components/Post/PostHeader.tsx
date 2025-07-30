@@ -19,7 +19,7 @@ interface PostHeaderProps {
 
 const PostHeader: React.FC<PostHeaderProps> = ({
   id: postId,
-  user: { profileImageUrl: userPic, username, id: userId },
+  user: { profileImageUrl: userPic, username },
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const outside = useRef<HTMLDivElement>(null);
