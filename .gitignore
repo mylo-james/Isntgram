@@ -9,6 +9,9 @@ node_modules
 
 # testing
 /coverage
+/tests
+.coverage
+.coveragerc
 
 # production
 /build/
@@ -31,6 +34,14 @@ __pycache__/
 .venv
 .DS_Store
 .vscode/
+.github/
+instance/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+*.sqlite3
+*.db
+legacy-backup*
 
 # Package lock files
 package-lock.json
