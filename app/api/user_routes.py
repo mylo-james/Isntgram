@@ -1,6 +1,5 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, current_app
 from ..models import db, User
-from ..config import Config
 
 import jwt
 
@@ -20,7 +19,13 @@ def lookup_user(username):
 @user_routes.route('', methods=['PUT'])
 def update_user():
     data = request.json
+    if not data or "id" not in data:
+        return {"error": "Missing required data"}, 400
+    
     user = User.query.filter(User.id == data["id"]).first()
+    if not user:
+        return {"error": "User not found"}, 404
+    
     old_user = user.to_dict()
     if user.username != data["username"]:
         if User.query.filter(User.username == data['username']).first():
@@ -36,19 +41,24 @@ def update_user():
         user.bio = data["bio"]
     db.session.commit()
 
-    old_keys = set(old_user.values())
-    new_keys = set(user.to_dict().values())
-
-    if len(old_keys.intersection(new_keys)) == 6:
+    # Check if any changes were actually made
+    new_user = user.to_dict()
+    if (old_user['username'] == new_user['username'] and 
+        old_user['email'] == new_user['email'] and 
+        old_user['full_name'] == new_user['full_name'] and 
+        old_user['bio'] == new_user['bio']):
         return {"error": "No changes made"}, 401
 
-    access_token = jwt.encode({'email': user.email}, Config.SECRET_KEY, algorithm="HS256")
-    return {'access_token': access_token.decode('UTF-8'), 'user': user.to_dict()}
+    access_token = jwt.encode({'email': user.email}, current_app.config['SECRET_KEY'], algorithm="HS256")
+    return {'access_token': access_token, 'user': user.to_dict()}
 
 
 @user_routes.route('/<id>/resetImg')
-def resetImg(id):
+def reset_img(id):
     user = User.query.filter(User.id == id).first()
+    
+    if not user:
+        return {"error": "User not found"}, 404
 
     user.profile_image_url = 'https://slickpics.s3.us-east-2.amazonaws.com/uploads/FriJul171300242020.png'
     db.session.commit()

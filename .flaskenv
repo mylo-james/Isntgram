@@ -1,3 +1,3 @@
-FLASK_APP=server.py
-FLASK_ENV=production
+FLASK_APP=app
+FLASK_ENV=development
 PORT=8080

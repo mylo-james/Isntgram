@@ -49,7 +49,7 @@ export default defineConfig({
     // Proxy API calls to Flask backend (replaces package.json proxy)
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:5000',
+        target: 'http://127.0.0.1:8080',
         changeOrigin: true,
         secure: false,
       },

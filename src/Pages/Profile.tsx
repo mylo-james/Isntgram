@@ -5,14 +5,15 @@ import ProfilePosts from '../components/Profile/ProfilePosts';
 import { useProfile, useUser } from '../hooks/useContexts';
 import LoadingPage from '../components/Loading/LoadingPage';
 import { useParams } from 'react-router-dom';
-import { apiCall } from '../utils/apiMiddleware';
-import { User, Post } from '../types';
+import { useApi } from '../utils/apiComposable';
+import { User, Post, ProfileResponse } from '../types';
 
 const Profile: React.FC = () => {
   const [windowSize, setWindowSize] = useState<number>(window.innerWidth);
   const { profileData, setProfileData } = useProfile();
   const { currentUser } = useUser();
   const { username } = useParams<{ username?: string }>();
+  const { getProfile, error } = useApi();
 
   useEffect(() => {
     const handleResize = () => {
@@ -33,44 +34,40 @@ const Profile: React.FC = () => {
 
     const loadProfile = async () => {
       try {
-        // First, look up the user by username to get their ID
-        const userLookupResponse = (await apiCall(
-          `/api/user/lookup/${username}`
-        )) as { user: User };
+        // Use the API composable to fetch profile data with proper middleware conversion
+        const profileResponse = await getProfile(username);
 
-        // Then fetch the profile data using the user ID
-        const profileResponse = (await apiCall(
-          `/api/profile/${userLookupResponse.user.id}`
-        )) as {
-          user: User;
-          posts: Post[];
-          followersList?: User[];
-          followingList?: User[];
-        };
+        if (profileResponse.error) {
+          console.error('Failed to fetch profile:', profileResponse.error);
+          return;
+        }
 
-        // The API returns { user: User, posts: Post[], ... }
-        // But ProfileContext expects just the User object
-        // Let's merge the user data with posts and other profile info
+        if (!profileResponse.data) {
+          console.error('No profile data found');
+          return;
+        }
+
+        // The API middleware converts snake_case to camelCase
+        // So we expect camelCase properties in the response
         const profileUser: User = {
-          ...profileResponse.user,
-          posts: profileResponse.posts ?? [],
-          // Note: followers/following lists come as User[] from API
-          // but User interface expects Follow[]. For now, we'll omit them
-          // and let the components fetch follow relationships separately
+          ...profileResponse.data.user,
+          posts: profileResponse.data.posts ?? [],
+          followers: profileResponse.data.followersList ?? [],
+          following: profileResponse.data.followingList ?? [],
         };
 
         setProfileData(profileUser);
-      } catch {
-        // console.error(
-        //   `Failed to load profile for user "${username}":`,
-        //   error instanceof Error ? error.message : 'Unknown error'
-        // );
+      } catch (error) {
+        console.error(
+          `Failed to load profile for user "${username}":`,
+          error instanceof Error ? error.message : 'Unknown error'
+        );
         // Could also set an error state here for user feedback
       }
     };
 
     loadProfile();
-  }, [username, setProfileData]);
+  }, [username, setProfileData, getProfile]);
 
   if (!profileData || !currentUser?.id) {
     return <LoadingPage positioner={{ animationDuration: '1s' }} />;
@@ -84,6 +81,11 @@ const Profile: React.FC = () => {
   return (
     <div className='pt-14 w-full flex flex-col items-center min-h-screen sm:pt-20 sm:px-5'>
       <div className='w-full max-w-[975px] px-4 sm:px-0'>
+        {error && (
+          <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm mb-4'>
+            {error}
+          </div>
+        )}
         <div className='mb-6'>
           <ProfileHeader windowSize={windowSize} />
         </div>

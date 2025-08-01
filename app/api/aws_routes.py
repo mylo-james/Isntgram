@@ -14,25 +14,30 @@ BUCKET = 'isntgram'
 @aws_routes.route('/<id>', methods=["POST"])
 def upload(id):
     if request.method == "POST":
-        f = request.files['file']
-        f.filename = change_name(f.filename)
-        upload_file(f, BUCKET)
-        user = User.query.filter(User.id == id).first()
-        user.profile_image_url = f'https://isntgram.s3.us-east-2.amazonaws.com/{f.filename}'
-        db.session.commit()
-        return {"img": f'https://isntgram.s3.us-east-2.amazonaws.com/{f.filename}'}
+        try:
+            f = request.files['file']
+            f.filename = change_name(f.filename)
+            upload_file(f, BUCKET)
+            user = User.query.filter(User.id == id).first()
+            if not user:
+                return {"error": "User not found"}, 404
+            user.profile_image_url = f'https://isntgram.s3.us-east-2.amazonaws.com/{f.filename}'
+            db.session.commit()
+            return {"img": f'https://isntgram.s3.us-east-2.amazonaws.com/{f.filename}'}
+        except Exception as e:
+            return {"error": str(e)}, 500
 
 
 @aws_routes.route('/post/<current_user_id>/<content>', methods=["POST"])
 def upload_post(current_user_id, content):
-    f = request.files['file']
-    f.filename = change_name(f.filename)
-    upload_file(f, BUCKET)
-    image_url = f'https://isntgram.s3.us-east-2.amazonaws.com/{f.filename}'
-    if content == 'null':
-      content = ''
-
     try:
+        f = request.files['file']
+        f.filename = change_name(f.filename)
+        upload_file(f, BUCKET)
+        image_url = f'https://isntgram.s3.us-east-2.amazonaws.com/{f.filename}'
+        if content == 'null':
+          content = ''
+
         post = Post(user_id=current_user_id, image_url=image_url, caption=content)
         db.session.add(post)
         db.session.commit()
@@ -40,8 +45,8 @@ def upload_post(current_user_id, content):
         return post_dict
     except AssertionError as message:
         return jsonify({"error": str(message)}), 400
-
-    return post.to_dict()
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 def upload_file(file, bucket):

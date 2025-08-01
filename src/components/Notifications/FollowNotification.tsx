@@ -1,8 +1,9 @@
 import React, { useContext, useState, useEffect, CSSProperties } from 'react';
 import { ProfileContext } from '../../Contexts';
 import { useUser } from '../../hooks/useContexts';
-import { apiCall } from '../../utils/apiMiddleware';
+import { useApi } from '../../utils/apiComposable';
 import { Post, Follow } from '../../types';
+import type { FollowUserRequest } from '../../types/api';
 
 interface FollowNotificationProps {
   style?: CSSProperties;
@@ -22,6 +23,7 @@ const FollowNotification: React.FC<FollowNotificationProps> = ({
   const { currentUser } = useUser();
   const profileContext = useContext(ProfileContext);
   const [followingList, setFollowingList] = useState<number[]>([]);
+  const { followUser, unfollowUser, isLoading, error, clearError } = useApi();
 
   // All hooks must be called before any conditional returns
   useEffect(() => {
@@ -42,48 +44,61 @@ const FollowNotification: React.FC<FollowNotificationProps> = ({
 
   const { profileData, setProfileData } = profileContext;
 
-  const followUser = async () => {
+  const handleFollowUser = async () => {
     if (!currentUser?.id) return;
 
-    const body = { userId: currentUser.id, userFollowedId: user.id };
-    try {
-      const response = (await apiCall('/api/follow', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      })) as Follow;
+    clearError();
 
-      const updatesList = [...(profileData?.following ?? []), response];
-      if (profileData) {
-        setProfileData({
-          ...profileData,
-          following: updatesList,
-        });
+    const followRequest: FollowUserRequest = {
+      userId: currentUser.id,
+      userFollowedId: user.id,
+    };
+
+    try {
+      const response = await followUser(followRequest);
+
+      if (response.error) {
+        console.error('Failed to follow user:', response.error);
+        return;
       }
-    } catch {
-      // console.error(e);
+
+      if (response.data?.follow) {
+        const updatesList = [
+          ...(profileData?.following ?? []),
+          response.data.follow,
+        ];
+        if (profileData) {
+          setProfileData({
+            ...profileData,
+            following: updatesList,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error following user:', error);
     }
   };
 
-  const unfollowUser = async () => {
+  const handleUnfollowUser = async () => {
     if (!currentUser?.id) return;
 
-    const body = { userId: currentUser.id, userFollowedId: user.id };
-    try {
-      const response = (await apiCall('/api/follow', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      })) as { userFollowedId: number };
+    clearError();
 
-      const { userFollowedId: deletedId } = response;
+    const unfollowRequest: FollowUserRequest = {
+      userId: currentUser.id,
+      userFollowedId: user.id,
+    };
+
+    try {
+      const response = await unfollowUser(unfollowRequest);
+
+      if (response.error) {
+        console.error('Failed to unfollow user:', response.error);
+        return;
+      }
 
       const filteredList = (profileData?.following ?? []).filter(
-        (user: Follow) => user.userFollowedId !== deletedId
+        (user: Follow) => user.userFollowedId !== user.id
       );
       if (profileData) {
         setProfileData({
@@ -91,19 +106,25 @@ const FollowNotification: React.FC<FollowNotificationProps> = ({
           following: filteredList,
         });
       }
-    } catch {
-      // console.error(e);
+    } catch (error) {
+      console.error('Error unfollowing user:', error);
     }
   };
 
   if (!followingList) {
     return null;
   }
+
   return (
     <div
       className='flex justify-between items-center p-1.5 border-b border-gray-300 h-12 w-full object-cover animate-fadeIn'
       style={style}
     >
+      {error && (
+        <div className='absolute top-0 left-0 right-0 bg-red-50 border border-red-200 text-red-700 px-2 py-1 rounded text-xs'>
+          {error}
+        </div>
+      )}
       <>
         <a href={`/profile/${user.id}`}>
           <img
@@ -124,19 +145,21 @@ const FollowNotification: React.FC<FollowNotificationProps> = ({
         {followingList.includes(user.id) ? (
           <div>
             <button
-              className='h-6 bg-transparent px-2 py-1 border border-gray-300 rounded-sm text-xs font-bold w-[85px] hover:bg-gray-50 transition-colors'
-              onClick={unfollowUser}
+              className='h-6 bg-transparent px-2 py-1 border border-gray-300 rounded-sm text-xs font-bold w-[85px] hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+              onClick={handleUnfollowUser}
+              disabled={isLoading}
             >
-              Following{' '}
+              {isLoading ? 'Unfollowing...' : 'Following'}
             </button>
           </div>
         ) : (
           <div>
             <button
-              className='h-6 bg-blue-500 text-white px-2 py-1 border-none rounded-sm text-xs font-bold w-[85px] outline-none hover:bg-blue-600 transition-colors'
-              onClick={followUser}
+              className='h-6 bg-blue-500 text-white px-2 py-1 border-none rounded-sm text-xs font-bold w-[85px] outline-none hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+              onClick={handleFollowUser}
+              disabled={isLoading}
             >
-              Follow
+              {isLoading ? 'Following...' : 'Follow'}
             </button>
           </div>
         )}

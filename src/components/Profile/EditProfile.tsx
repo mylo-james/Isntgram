@@ -4,8 +4,9 @@ import { useUser, useProfile } from '../../hooks/useContexts';
 import Nav from '../Nav';
 import { toast } from 'react-toastify';
 import ProfilePicModal from './ProfilePicModal';
-import { apiCall } from '../../utils/apiMiddleware';
+import { useApi } from '../../utils/apiComposable';
 import { User } from '../../types';
+import type { UpdateUserRequest } from '../../types/api';
 
 const EditProfile: React.FC = () => {
   const [username, setUsername] = useState<string>('');
@@ -18,6 +19,7 @@ const EditProfile: React.FC = () => {
   const { currentUser, setCurrentUser } = useUser();
   const { profileData } = useProfile();
   const navigate = useNavigate();
+  const { updateUser, isLoading, error, clearError } = useApi();
 
   const closeEditPicModal = () => {
     setIsEditProfilePicOpen(false);
@@ -72,22 +74,33 @@ const EditProfile: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = { id: currentUser?.id, username, email, fullName, bio };
+    clearError();
+
+    const updateRequest: UpdateUserRequest = {
+      username,
+      email,
+      fullName: fullName,
+      bio,
+    };
 
     try {
-      const user = (await apiCall('/api/user', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      })) as User;
+      const response = await updateUser(updateRequest);
 
-      setCurrentUser(user);
-      toast.success('Profile updated!', {
-        autoClose: 3000,
-        closeOnClick: true,
-      });
+      if (response.error) {
+        toast.error(response.error, {
+          autoClose: 3000,
+          closeOnClick: true,
+        });
+        return;
+      }
+
+      if (response.data?.user) {
+        setCurrentUser(response.data.user);
+        toast.success('Profile updated!', {
+          autoClose: 3000,
+          closeOnClick: true,
+        });
+      }
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : 'Failed to update profile';
@@ -101,10 +114,17 @@ const EditProfile: React.FC = () => {
   const goBack = () => {
     navigate(`/profile/${currentUser?.username}`);
   };
+
   return (
     <>
       <Nav />
       <div className='flex flex-col items-center justify-center w-full p-5 mt-[54px] mb-[54px] bg-white sm:mt-[74px] sm:mx-auto sm:border sm:border-gray-300 sm:w-[500px] sm:rounded-sm'>
+        {error && (
+          <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm mb-4 w-full'>
+            {error}
+          </div>
+        )}
+
         <div className='flex w-full'>
           <img
             onClick={changeProfilePic}
@@ -154,6 +174,7 @@ const EditProfile: React.FC = () => {
             onChange={updateState}
             value={fullName}
             className='px-2 h-8 w-full border border-gray-300 rounded-sm mb-5 focus:border-gray-400 focus:outline-none transition-colors'
+            disabled={isLoading}
           />
           <p className='text-xs text-gray-500 -mt-2.5 mb-4 w-full'>
             Help people discover your account by using the name you're known by:
@@ -171,6 +192,7 @@ const EditProfile: React.FC = () => {
             onChange={updateState}
             value={username}
             className='px-2 h-8 w-full border border-gray-300 rounded-sm mb-5 focus:border-gray-400 focus:outline-none transition-colors'
+            disabled={isLoading}
           />
           <label htmlFor='bio' className='font-bold w-full text-gray-800 mb-1'>
             Bio
@@ -181,6 +203,7 @@ const EditProfile: React.FC = () => {
             onChange={updateState}
             value={bio ? bio : ''}
             className='resize-none py-1.5 px-2.5 min-h-[77px] w-full border border-gray-300 rounded mb-5 focus:border-gray-400 focus:outline-none transition-colors'
+            disabled={isLoading}
           />
 
           <label
@@ -195,17 +218,20 @@ const EditProfile: React.FC = () => {
             name='email'
             onChange={updateState}
             className='px-2 h-8 w-full border border-gray-300 rounded-sm mb-5 focus:border-gray-400 focus:outline-none transition-colors'
+            disabled={isLoading}
           />
           <button
             type='submit'
-            className='bg-blue-500 font-bold text-white border-none w-full rounded h-7.5 hover:bg-blue-600 transition-colors'
+            className='bg-blue-500 font-bold text-white border-none w-full rounded h-7.5 hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+            disabled={isLoading}
           >
-            Submit
+            {isLoading ? 'Updating...' : 'Submit'}
           </button>
         </form>
         <button
           className='text-blue-500 bg-white mt-5 border border-blue-500 w-full rounded h-7.5 hover:bg-blue-50 transition-colors'
           onClick={goBack}
+          disabled={isLoading}
         >
           Go back
         </button>

@@ -1,7 +1,8 @@
 import React, { useState, FormEvent, ChangeEvent } from 'react';
 import { showErrors } from '../../config';
 import { SignupFormData } from '../../types';
-import { apiCall } from '../../utils/apiMiddleware';
+import { useApi } from '../../utils/apiComposable';
+import type { SignupRequest } from '../../types/api';
 
 interface RegisterFormData extends SignupFormData {
   fullName: string;
@@ -9,6 +10,8 @@ interface RegisterFormData extends SignupFormData {
 }
 
 const RegisterForm: React.FC = () => {
+  const { signup, isLoading, error, clearError } = useApi();
+
   const [formData, setFormData] = useState<RegisterFormData>({
     username: '',
     email: '',
@@ -28,25 +31,40 @@ const RegisterForm: React.FC = () => {
     data: RegisterFormData = formData
   ): Promise<void> => {
     e.preventDefault();
+    clearError();
+
+    // Convert legacy form data to new API format
+    const signupRequest: SignupRequest = {
+      username: data.username,
+      email: data.email,
+      fullName: data.fullName,
+      password: data.password,
+      confirmPassword: data.confirmPassword,
+      bio: undefined, // Optional field
+    };
 
     try {
-      await apiCall('/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await signup(signupRequest);
 
-      window.location.reload();
-    } catch {
-      // console.error('Registration error:', error);
+      if (response.error) {
+        showErrors([response.error]);
+      } else {
+        // Registration successful, reload the page
+        window.location.reload();
+      }
+    } catch (err) {
       showErrors(['An error occurred during registration']);
     }
   };
 
   return (
     <div className='flex justify-evenly items-center flex-col h-[70vh] w-full'>
+      {error && (
+        <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm mb-4 w-full'>
+          {error}
+        </div>
+      )}
+
       <form
         onSubmit={handleSubmit}
         className='flex flex-col justify-between items-center h-[60%] w-4/5 text-sm text-center'
@@ -62,6 +80,7 @@ const RegisterForm: React.FC = () => {
           value={formData.username}
           className='w-full px-2 h-8 border border-gray-300 rounded text-left mb-5 focus:border-gray-400 focus:outline-none transition-colors'
           required
+          disabled={isLoading}
         />
 
         <label className='sr-only' htmlFor='email'>
@@ -76,6 +95,7 @@ const RegisterForm: React.FC = () => {
           value={formData.email}
           className='w-full px-2 h-8 border border-gray-300 rounded text-left mb-5 focus:border-gray-400 focus:outline-none transition-colors'
           required
+          disabled={isLoading}
         />
 
         <label className='sr-only' htmlFor='full_name'>
@@ -89,6 +109,7 @@ const RegisterForm: React.FC = () => {
           value={formData.fullName}
           className='w-full px-2 h-8 border border-gray-300 rounded text-left mb-5 focus:border-gray-400 focus:outline-none transition-colors'
           required
+          disabled={isLoading}
         />
 
         <label className='sr-only' htmlFor='password'>
@@ -103,6 +124,7 @@ const RegisterForm: React.FC = () => {
           value={formData.password}
           className='w-full px-2 h-8 border border-gray-300 rounded text-left mb-5 focus:border-gray-400 focus:outline-none transition-colors'
           required
+          disabled={isLoading}
         />
 
         <label className='sr-only' htmlFor='confirmPassword'>
@@ -117,13 +139,15 @@ const RegisterForm: React.FC = () => {
           value={formData.confirmPassword}
           className='w-full px-2 h-8 border border-gray-300 rounded text-left mb-5 focus:border-gray-400 focus:outline-none transition-colors'
           required
+          disabled={isLoading}
         />
 
         <button
           type='submit'
-          className='w-full bg-blue-500 border-none rounded h-7.5 mb-2.5 text-white hover:bg-blue-600 transition-colors cursor-pointer'
+          className='w-full bg-blue-500 border-none rounded h-7.5 mb-2.5 text-white hover:bg-blue-600 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
+          disabled={isLoading}
         >
-          Register
+          {isLoading ? 'Creating Account...' : 'Register'}
         </button>
 
         <div className='text-center'>

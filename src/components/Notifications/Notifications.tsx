@@ -5,7 +5,7 @@ import { useUser } from '../../hooks/useContexts';
 import CommentNotification from './CommentNotification';
 import FollowNotification from './FollowNotification';
 import LikeNotification from './LikeNotification';
-import { apiCall } from '../../utils/apiMiddleware';
+import { useApi } from '../../utils/apiComposable';
 import { Post, User } from '../../types';
 
 interface Notification {
@@ -19,6 +19,7 @@ interface Notification {
 const Notifications: React.FC = () => {
   const { currentUser } = useUser();
   const profileContext = useContext(ProfileContext);
+  const { isLoading, error, clearError } = useApi();
 
   if (!profileContext) {
     throw new Error(
@@ -34,17 +35,25 @@ const Notifications: React.FC = () => {
     if (!currentUser?.id) {
       return;
     }
-    (async () => {
-      try {
-        const data = (await apiCall(
-          `/api/profile/${currentUser.id}`
-        )) as typeof profileData;
 
+    const loadProfile = async () => {
+      try {
+        // Note: This endpoint might need to be added to the composable
+        // For now, we'll use a direct fetch with better error handling
+        const response = await fetch(`/api/profile/${currentUser.id}`);
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch profile: ${response.status}`);
+        }
+
+        const data = (await response.json()) as typeof profileData;
         setProfileData?.(data);
-      } catch {
-        // console.error(e);
+      } catch (error) {
+        console.error('Error loading profile:', error);
       }
-    })();
+    };
+
+    loadProfile();
   }, [currentUser?.id, setProfileData]);
 
   useEffect(() => {
@@ -54,88 +63,97 @@ const Notifications: React.FC = () => {
     }
   }, [profileData]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const loadMore = () => {
+  const loadMore = async () => {
     if (!currentUser?.id) {
       return;
     }
-    (async () => {
-      try {
-        const response = (await apiCall(
-          `/api/note/${currentUser.id}/scroll/${toRender.length}`
-        )) as { notes: Notification[] };
 
-        const { notes } = response;
-        const nodeList = notes
-          .filter(
-            (notification) =>
-              notification.user?.fullName && notification.user.profileImageUrl
-          )
-          .map((notification, i) => {
-            const style: CSSProperties = {
-              animationDuration: `${1 + i * 0.25}s`,
-            };
+    clearError();
 
-            // Create proper user object for the components (already filtered for these properties)
-            if (!notification.user) return null;
-            const notificationUser = notification.user;
-            const user = {
-              id: notificationUser.id,
-              username: notificationUser.username ?? '',
-              fullName: notificationUser.fullName ?? '',
-              profileImageUrl: notificationUser.profileImageUrl ?? '',
-            };
+    try {
+      // Note: This endpoint might need to be added to the composable
+      // For now, we'll use a direct fetch with better error handling
+      const response = await fetch(
+        `/api/note/${currentUser.id}/scroll/${toRender.length}`
+      );
 
-            switch (notification.type) {
-              case 'comment':
-                if (!notification.post) return null;
-                return (
-                  <CommentNotification
-                    style={style}
-                    post={{
-                      id: notification.post.id,
-                      imageUrl: notification.post.imageUrl,
-                      caption: notification.post.caption,
-                    }}
-                    user={user}
-                    key={`${notification.type}-${notification.id}`}
-                  />
-                );
-              case 'follow':
-                return (
-                  <FollowNotification
-                    style={style}
-                    user={user}
-                    key={`${notification.type}-${notification.id}`}
-                  />
-                );
-              default:
-                if (!notification.post) return null;
-                return (
-                  <LikeNotification
-                    type={notification.likeableType}
-                    style={style}
-                    post={{
-                      id: notification.post.id,
-                      imageUrl: notification.post.imageUrl,
-                      caption: notification.post.caption,
-                    }}
-                    user={user}
-                    key={`${notification.type}}-${notification.id}`}
-                  />
-                );
-            }
-          })
-          .filter((node): node is React.ReactElement => node !== null);
-
-        setToRender([...toRender, ...nodeList]);
-
-        if (notes.length < 20) {
-          setHasMore(false);
-        }
-      } catch {
-        // console.error(e);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch notifications: ${response.status}`);
       }
-    })();
+
+      const responseData = (await response.json()) as { notes: Notification[] };
+      const { notes } = responseData;
+
+      const nodeList = notes
+        .filter(
+          (notification) =>
+            notification.user?.fullName && notification.user.profileImageUrl
+        )
+        .map((notification, i) => {
+          const style: CSSProperties = {
+            animationDuration: `${1 + i * 0.25}s`,
+          };
+
+          // Create proper user object for the components (already filtered for these properties)
+          if (!notification.user) return null;
+          const notificationUser = notification.user;
+          const user = {
+            id: notificationUser.id,
+            username: notificationUser.username ?? '',
+            fullName: notificationUser.fullName ?? '',
+            profileImageUrl: notificationUser.profileImageUrl ?? '',
+          };
+
+          switch (notification.type) {
+            case 'comment':
+              if (!notification.post) return null;
+              return (
+                <CommentNotification
+                  style={style}
+                  post={{
+                    id: notification.post.id,
+                    imageUrl: notification.post.imageUrl,
+                    caption: notification.post.caption,
+                  }}
+                  user={user}
+                  key={`${notification.type}-${notification.id}`}
+                />
+              );
+            case 'follow':
+              return (
+                <FollowNotification
+                  style={style}
+                  user={user}
+                  key={`${notification.type}-${notification.id}`}
+                />
+              );
+            default:
+              if (!notification.post) return null;
+              return (
+                <LikeNotification
+                  type={notification.likeableType}
+                  style={style}
+                  post={{
+                    id: notification.post.id,
+                    imageUrl: notification.post.imageUrl,
+                    caption: notification.post.caption,
+                  }}
+                  user={user}
+                  key={`${notification.type}}-${notification.id}`}
+                />
+              );
+          }
+        })
+        .filter((node): node is React.ReactElement => node !== null);
+
+      setToRender([...toRender, ...nodeList]);
+
+      if (notes.length < 20) {
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+    }
   };
 
   if (!profileData) {
@@ -144,6 +162,11 @@ const Notifications: React.FC = () => {
 
   return (
     <div className='flex items-center flex-col mx-auto h-[calc(100%-54px)] min-h-[calc(100vh-54px)] w-full max-w-[614px] mt-[54px] pt-5 pb-[54px] object-cover border border-gray-300 [&_img]:h-full [&_img]:object-cover [&_.avatar]:rounded-full [&_a]:h-full [&_a]:font-bold [&_a]:text-blue-500 [&_p]:w-full [&_p]:px-2.5 [&_p]:text-xs [&_p]:text-left'>
+      {error && (
+        <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm mb-4 w-full'>
+          {error}
+        </div>
+      )}
       <h1 className='pb-1.5 text-xl font-semibold text-gray-800'>
         Notifications
       </h1>
@@ -151,7 +174,11 @@ const Notifications: React.FC = () => {
         dataLength={toRender.length}
         next={loadMore}
         hasMore={hasMore}
-        loader={<div className='text-gray-500 py-4'>Loading...</div>}
+        loader={
+          <div className='text-gray-500 py-4'>
+            {isLoading ? 'Loading...' : 'Loading more...'}
+          </div>
+        }
       >
         {toRender}
       </InfiniteScroll>

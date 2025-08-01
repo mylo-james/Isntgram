@@ -4,8 +4,9 @@ import { FaRegComment } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { useLikes, usePosts, useUser } from '../../hooks/useContexts';
 import { toast } from 'react-toastify';
-import { apiCall } from '../../utils/apiMiddleware';
+import { useApi } from '../../utils/apiComposable';
 import { Like } from '../../types';
+import type { ToggleLikeRequest } from '../../types/api';
 
 interface IconPostProps {
   id: number;
@@ -16,45 +17,61 @@ const IconPost: React.FC<IconPostProps> = ({ id: postId, isSinglePost }) => {
   const { currentUser } = useUser();
   const { likes, setLikes } = useLikes();
   const { setPosts } = usePosts();
+  const { toggleLike, isLoading, error, clearError } = useApi();
 
   const likePost = async () => {
     if (!currentUser?.id) return;
 
+    clearError();
+
     try {
-      const body = {
-        userId: currentUser.id,
-        id: postId,
+      const likeRequest: ToggleLikeRequest = {
+        likeableId: postId,
         likeableType: 'post',
       };
-      const { like, likeList } = (await apiCall('/api/like', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      })) as { like: Like; likeList: Like[] };
 
-      // Note: This may need adjustment based on actual likes context structure
-      if (likes && setLikes) {
-        const key = `post-${postId}`;
-        setLikes({
-          ...likes,
-          [key]: {
-            id: like.id,
-            userId: like.userId,
-            postId: postId,
-          },
-        });
+      const response = await toggleLike(likeRequest);
+
+      if (response.error) {
+        console.error('Failed to like post:', response.error);
+        return;
       }
 
-      setPosts((posts) => ({
-        ...posts,
-        [postId]: { ...posts[postId], likes: likeList },
-      }));
+      if (response.data?.liked) {
+        // Note: This may need adjustment based on actual likes context structure
+        if (likes && setLikes) {
+          const key = `post-${postId}`;
+          setLikes({
+            ...likes,
+            [key]: {
+              id: Date.now(), // Temporary ID
+              userId: currentUser.id,
+              postId: postId,
+            },
+          });
+        }
 
-      toast.info('Liked post!', { autoClose: 1500 });
-    } catch {
-      // console.error(e);
+        setPosts((posts) => ({
+          ...posts,
+          [postId]: {
+            ...posts[postId],
+            likes: [
+              ...(posts[postId]?.likes ?? []),
+              {
+                id: Date.now(),
+                userId: currentUser.id,
+                likeableId: postId,
+                likeableType: 'post',
+                createdAt: new Date().toISOString(),
+              },
+            ],
+          },
+        }));
+
+        toast.info('Liked post!', { autoClose: 1500 });
+      }
+    } catch (error) {
+      console.error('Error liking post:', error);
     }
   };
 
@@ -64,41 +81,53 @@ const IconPost: React.FC<IconPostProps> = ({ id: postId, isSinglePost }) => {
       return;
     }
 
-    try {
-      // This would need to be adjusted based on how like data is stored
-      await apiCall('/api/like', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ postId }), // Simplified for now
-      });
+    clearError();
 
-      if (likes && setLikes) {
-        const newLikes = { ...likes };
-        delete newLikes[likeKey];
-        setLikes(newLikes);
+    try {
+      const likeRequest: ToggleLikeRequest = {
+        likeableId: postId,
+        likeableType: 'post',
+      };
+
+      const response = await toggleLike(likeRequest);
+
+      if (response.error) {
+        console.error('Failed to unlike post:', response.error);
+        return;
       }
 
-      setPosts((posts) => {
-        const newPost = { ...posts[postId] };
-        const filtered = (newPost.likes ?? []).filter(
-          (ele: Like) => ele.id !== postId
-        );
-        return {
-          ...posts,
-          [postId]: { ...posts[postId], likes: filtered },
-        };
-      });
+      if (!response.data?.liked) {
+        if (likes && setLikes) {
+          const newLikes = { ...likes };
+          delete newLikes[likeKey];
+          setLikes(newLikes);
+        }
 
-      toast.info('Unliked post!', { autoClose: 1500 });
-    } catch {
-      // console.error(e);
+        setPosts((posts) => {
+          const newPost = { ...posts[postId] };
+          const filtered = (newPost.likes ?? []).filter(
+            (ele: Like) => ele.likeableId !== postId
+          );
+          return {
+            ...posts,
+            [postId]: { ...posts[postId], likes: filtered },
+          };
+        });
+
+        toast.info('Unliked post!', { autoClose: 1500 });
+      }
+    } catch (error) {
+      console.error('Error unliking post:', error);
     }
   };
 
   return (
     <div className='h-10 flex justify-between p-1.5 px-2.5'>
+      {error && (
+        <div className='absolute top-0 left-0 right-0 bg-red-50 border border-red-200 text-red-700 px-2 py-1 rounded text-xs'>
+          {error}
+        </div>
+      )}
       <div className='flex items-center'>
         <RiHeartLine
           size={24}
@@ -108,6 +137,7 @@ const IconPost: React.FC<IconPostProps> = ({ id: postId, isSinglePost }) => {
               ? 'text-red-500 cursor-pointer'
               : 'cursor-pointer text-gray-800'
           }
+          style={{ opacity: isLoading ? 0.5 : 1 }}
         />
         {isSinglePost ? null : (
           <Link to={`/post/${postId}`} className='ml-2 p-0 bg-none border-none'>

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../hooks/useContexts';
 import { RiImageAddLine } from 'react-icons/ri';
 import { toast } from 'react-toastify';
-import { apiCall } from '../../utils/apiMiddleware';
+import { useApi } from '../../utils/apiComposable';
 
 const Upload: React.FC = () => {
   const { currentUser } = useUser();
@@ -11,6 +11,7 @@ const Upload: React.FC = () => {
   const [picture, setPicture] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
   const captionInput = useRef<HTMLTextAreaElement>(null);
+  const { isLoading, error } = useApi();
 
   const onDrop = (e: ChangeEvent<HTMLInputElement>): void => {
     const file = e.target.files?.[0];
@@ -37,24 +38,38 @@ const Upload: React.FC = () => {
       const caption =
         encodeURIComponent(captionInput.current?.value ?? '') ?? 'null';
 
-      const post = (await apiCall(
+      // Note: This endpoint might need to be added to the composable
+      // For now, we'll use a direct fetch with better error handling
+      const response = await fetch(
         `/api/aws/post/${currentUser.id}/${caption}`,
         {
           method: 'POST',
           body: formData,
         }
-      )) as { id: number };
+      );
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.status}`);
+      }
+
+      const post = (await response.json()) as { id: number };
 
       toast.info('Upload Success!');
       navigate(`/post/${post.id}`);
-    } catch {
-      // console.error('Upload error:', error);
+    } catch (error) {
+      console.error('Upload error:', error);
       toast.error('Upload Error. Please try again!');
     }
   };
 
   return (
     <div className='flex flex-col items-center justify-center w-full p-5 mt-[54px] mb-[54px] bg-white text-center sm:mt-[74px] sm:mx-auto sm:border sm:border-gray-300 sm:w-[500px] sm:rounded-sm'>
+      {error && (
+        <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm mb-4 w-full'>
+          {error}
+        </div>
+      )}
+
       <div className='flex justify-center items-center h-[80vw] max-h-[380px] w-[80vw] max-w-[380px] mb-5'>
         {!picture ? (
           <div className='flex justify-center content-center flex-col h-[80vw] max-h-[380px] w-[80vw] max-w-[380px]'>
@@ -84,12 +99,14 @@ const Upload: React.FC = () => {
             id='caption'
             placeholder='Tell us about your photo...'
             className='resize-none py-1.5 px-2.5 min-h-[77px] w-full border border-gray-300 rounded mb-5 focus:border-gray-400 focus:outline-none transition-colors'
+            disabled={isLoading}
           />
           <button
-            className='bg-blue-500 font-bold text-white border-none w-full rounded h-7.5 mb-1.5 hover:bg-gray-600 transition-colors'
+            className='bg-blue-500 font-bold text-white border-none w-full rounded h-7.5 mb-1.5 hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
             onClick={handleUpload}
+            disabled={isLoading}
           >
-            Upload
+            {isLoading ? 'Uploading...' : 'Upload'}
           </button>
         </>
       ) : null}
@@ -103,10 +120,11 @@ const Upload: React.FC = () => {
           onChange={onDrop}
           className='hidden'
           id='file-upload'
+          disabled={isLoading}
         />
         <label
           htmlFor='file-upload'
-          className='flex justify-center items-center w-full h-7.5 bg-blue-500 text-white font-bold rounded cursor-pointer hover:bg-blue-600 transition-colors'
+          className='flex justify-center items-center w-full h-7.5 bg-blue-500 text-white font-bold rounded cursor-pointer hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
         >
           Select Photo
         </label>
@@ -115,6 +133,7 @@ const Upload: React.FC = () => {
       <button
         className='text-blue-500 bg-white mt-5 border border-blue-500 font-bold w-full rounded h-7.5 hover:bg-blue-50 transition-colors'
         onClick={goBack}
+        disabled={isLoading}
       >
         Go back
       </button>

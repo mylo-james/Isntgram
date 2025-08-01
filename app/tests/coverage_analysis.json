@@ -1,0 +1,708 @@
+{
+  "timestamp": "2025-07-31T21:58:41.767000",
+  "analysis_results": [
+    {
+      "file_path": "app/api/auth_routes.py",
+      "analysis": {
+        "file_path": "app/api/auth_routes.py",
+        "file_name": "auth_routes",
+        "file_type": "route",
+        "functions": [
+          "def authenticate():",
+          "def login():",
+          "def logout():",
+          "def sign_up():",
+          "def unauthorized():"
+        ],
+        "classes": [],
+        "routes": [
+          "@auth_routes.route(\"\")",
+          "@auth_routes.route(\"/login\", methods=[\"POST\"])",
+          "@auth_routes.route(\"/logout\", methods=[\"POST\"])",
+          "@auth_routes.route(\"/signup\", methods=[\"POST\"])",
+          "@auth_routes.route(\"/unauthorized\")"
+        ],
+        "line_count": 167,
+        "complexity_score": 10
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_auth_routes.py",
+        "test_count": 26
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/api/user_routes.py",
+      "analysis": {
+        "file_path": "app/api/user_routes.py",
+        "file_name": "user_routes",
+        "file_type": "route",
+        "functions": [
+          "def lookup_user(username):",
+          "def update_user():",
+          "def reset_img(id):"
+        ],
+        "classes": [],
+        "routes": [
+          "@user_routes.route('/lookup/<username>')",
+          "@user_routes.route('', methods=['PUT'])",
+          "@user_routes.route('/<id>/resetImg')"
+        ],
+        "line_count": 67,
+        "complexity_score": 6
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_user_routes.py",
+        "test_count": 22
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/api/post_routes.py",
+      "analysis": {
+        "file_path": "app/api/post_routes.py",
+        "file_name": "post_routes",
+        "file_type": "route",
+        "functions": [
+          "def index(length: int):",
+          "def explore(length: int):",
+          "def create_post():",
+          "def update_post(post_id: int):",
+          "def delete_post(post_id: int):",
+          "def home_feed(id, length):",
+          "def get_post(post_id):"
+        ],
+        "classes": [],
+        "routes": [
+          "@post_routes.route(\"/scroll/<int:length>\")",
+          "@post_routes.route(\"/explore/<int:length>\")",
+          "@post_routes.route(\"\", methods=[\"POST\"])",
+          "@post_routes.route(\"/<int:post_id>\", methods=[\"PUT\"])",
+          "@post_routes.route(\"/<int:post_id>\", methods=[\"DELETE\"])",
+          "@post_routes.route(\"/<id>/scroll/<length>\")",
+          "@post_routes.route(\"/<post_id>\")"
+        ],
+        "line_count": 298,
+        "complexity_score": 14
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_post_routes.py",
+        "test_count": 30
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/api/comment_routes.py",
+      "analysis": {
+        "file_path": "app/api/comment_routes.py",
+        "file_name": "comment_routes",
+        "file_type": "route",
+        "functions": [
+          "def post_comment():"
+        ],
+        "classes": [],
+        "routes": [
+          "@comment_routes.route('', methods=['POST'])"
+        ],
+        "line_count": 51,
+        "complexity_score": 2
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_comment_routes.py",
+        "test_count": 5
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/api/like_routes.py",
+      "analysis": {
+        "file_path": "app/api/like_routes.py",
+        "file_name": "like_routes",
+        "file_type": "route",
+        "functions": [
+          "def get_user_likes(id):",
+          "def get_likes(likeable_type, id):",
+          "def post_like():",
+          "def delete_like():"
+        ],
+        "classes": [],
+        "routes": [
+          "@like_routes.route(\"/user/<id>\")",
+          "@like_routes.route(\"/<likeable_type>/<id>\")",
+          "@like_routes.route(\"\", methods=[\"POST\"])",
+          "@like_routes.route(\"\", methods=[\"DELETE\"])"
+        ],
+        "line_count": 66,
+        "complexity_score": 8
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_like_routes.py",
+        "test_count": 10
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/api/follow_routes.py",
+      "analysis": {
+        "file_path": "app/api/follow_routes.py",
+        "file_name": "follow_routes",
+        "file_type": "route",
+        "functions": [
+          "def get_follows(id):",
+          "def get_following(id):",
+          "def follow_user():",
+          "def delete_follow():"
+        ],
+        "classes": [],
+        "routes": [
+          "@follow_routes.route('/<id>')",
+          "@follow_routes.route('<id>/following')",
+          "@follow_routes.route('', methods=[\"POST\"])",
+          "@follow_routes.route('', methods = [\"DELETE\"])"
+        ],
+        "line_count": 51,
+        "complexity_score": 8
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_follow_routes.py",
+        "test_count": 9
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/api/aws_routes.py",
+      "analysis": {
+        "file_path": "app/api/aws_routes.py",
+        "file_name": "aws_routes",
+        "file_type": "route",
+        "functions": [
+          "def upload(id):",
+          "def upload_post(current_user_id, content):",
+          "def upload_file(file, bucket):",
+          "def change_name(file_name):"
+        ],
+        "classes": [],
+        "routes": [
+          "@aws_routes.route('/<id>', methods=[\"POST\"])",
+          "@aws_routes.route('/post/<current_user_id>/<content>', methods=[\"POST\"])"
+        ],
+        "line_count": 64,
+        "complexity_score": 6
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_aws_routes.py",
+        "test_count": 22
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/api/search_routes.py",
+      "analysis": {
+        "file_path": "app/api/search_routes.py",
+        "file_name": "search_routes",
+        "file_type": "route",
+        "functions": [
+          "def query():"
+        ],
+        "classes": [],
+        "routes": [
+          "@search_routes.route('')"
+        ],
+        "line_count": 25,
+        "complexity_score": 2
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_search_routes.py",
+        "test_count": 22
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/api/profile_routes.py",
+      "analysis": {
+        "file_path": "app/api/profile_routes.py",
+        "file_name": "profile_routes",
+        "file_type": "route",
+        "functions": [
+          "def index(username):"
+        ],
+        "classes": [],
+        "routes": [
+          "@profile_routes.route('/<username>')"
+        ],
+        "line_count": 48,
+        "complexity_score": 2
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_profile_routes.py",
+        "test_count": 21
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/api/note_routes.py",
+      "analysis": {
+        "file_path": "app/api/note_routes.py",
+        "file_name": "note_routes",
+        "file_type": "route",
+        "functions": [
+          "def index(id, length):"
+        ],
+        "classes": [],
+        "routes": [
+          "@note_routes.route('/<id>/scroll/<length>')"
+        ],
+        "line_count": 61,
+        "complexity_score": 2
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_note_routes.py",
+        "test_count": 8
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/models/user.py",
+      "analysis": {
+        "file_path": "app/models/user.py",
+        "file_name": "user",
+        "file_type": "model",
+        "functions": [
+          "def validate_username(self, key: str, value: str) -> str:",
+          "def password(self) -> str:",
+          "def password(self, password: str) -> None:",
+          "def check_password(self, password: str) -> bool:",
+          "def to_dict(self) -> dict[str, any]:"
+        ],
+        "classes": [
+          "class User(db.Model, UserMixin):"
+        ],
+        "routes": [],
+        "line_count": 84,
+        "complexity_score": 6
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_models.py",
+        "test_count": 17
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/models/post.py",
+      "analysis": {
+        "file_path": "app/models/post.py",
+        "file_name": "post",
+        "file_type": "model",
+        "functions": [
+          "def to_dict(self) -> dict[str, any]:",
+          "def to_dict_with_user(self) -> dict[str, any]:"
+        ],
+        "classes": [
+          "class Post(db.Model):"
+        ],
+        "routes": [],
+        "line_count": 65,
+        "complexity_score": 3
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_models.py",
+        "test_count": 17
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/models/comment.py",
+      "analysis": {
+        "file_path": "app/models/comment.py",
+        "file_name": "comment",
+        "file_type": "model",
+        "functions": [
+          "def to_dict(self) -> dict[str, any]:",
+          "def to_dict_with_user(self) -> dict[str, any]:"
+        ],
+        "classes": [
+          "class Comment(db.Model):"
+        ],
+        "routes": [],
+        "line_count": 68,
+        "complexity_score": 3
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_models.py",
+        "test_count": 17
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/models/like.py",
+      "analysis": {
+        "file_path": "app/models/like.py",
+        "file_name": "like",
+        "file_type": "model",
+        "functions": [
+          "def to_dict(self) -> dict[str, any]:",
+          "def get_likes_for_post(cls, post_id: int) -> list[Like]:",
+          "def get_likes_for_comment(cls, comment_id: int) -> list[Like]:",
+          "def user_liked_post(cls, user_id: int, post_id: int) -> bool:",
+          "def user_liked_comment(cls, user_id: int, comment_id: int) -> bool:"
+        ],
+        "classes": [
+          "class Like(db.Model):"
+        ],
+        "routes": [],
+        "line_count": 93,
+        "complexity_score": 6
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_models.py",
+        "test_count": 17
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/models/follow.py",
+      "analysis": {
+        "file_path": "app/models/follow.py",
+        "file_name": "follow",
+        "file_type": "model",
+        "functions": [
+          "def to_dict(self) -> dict[str, any]:",
+          "def is_following(cls, user_id: int, followed_user_id: int) -> bool:",
+          "def get_followers_count(cls, user_id: int) -> int:",
+          "def get_following_count(cls, user_id: int) -> int:"
+        ],
+        "classes": [
+          "class Follow(db.Model):"
+        ],
+        "routes": [],
+        "line_count": 75,
+        "complexity_score": 5
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_models.py",
+        "test_count": 17
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/schemas/auth_schemas.py",
+      "analysis": {
+        "file_path": "app/schemas/auth_schemas.py",
+        "file_name": "auth_schemas",
+        "file_type": "schema",
+        "functions": [
+          "def validate_password_strength(cls, v: str) -> str:",
+          "def validate_passwords_match(cls, v: str, info) -> str:",
+          "def validate_password_strength(cls, v: str) -> str:",
+          "def validate_passwords_match(cls, v: str, info) -> str:"
+        ],
+        "classes": [
+          "class LoginSchema(BaseModel):",
+          "class SignUpSchema(BaseModel):",
+          "class PasswordResetRequestSchema(BaseModel):",
+          "class PasswordResetSchema(BaseModel):",
+          "class AuthResponseSchema(BaseModel):"
+        ],
+        "routes": [],
+        "line_count": 104,
+        "complexity_score": 9
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_auth_schemas.py",
+        "test_count": 22
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/schemas/user_schemas.py",
+      "analysis": {
+        "file_path": "app/schemas/user_schemas.py",
+        "file_name": "user_schemas",
+        "file_type": "schema",
+        "functions": [],
+        "classes": [
+          "class UserBaseSchema(BaseModel):",
+          "class UserCreateSchema(UserBaseSchema):",
+          "class UserUpdateSchema(BaseModel):",
+          "class UserResponseSchema(UserBaseSchema):",
+          "class UserPublicSchema(BaseModel):",
+          "class UserStatsSchema(BaseModel):"
+        ],
+        "routes": [],
+        "line_count": 82,
+        "complexity_score": 6
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_user_schemas.py",
+        "test_count": 23
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/schemas/post_schemas.py",
+      "analysis": {
+        "file_path": "app/schemas/post_schemas.py",
+        "file_name": "post_schemas",
+        "file_type": "schema",
+        "functions": [],
+        "classes": [
+          "class PostBaseSchema(BaseModel):",
+          "class PostCreateSchema(PostBaseSchema):",
+          "class PostUpdateSchema(BaseModel):",
+          "class PostResponseSchema(PostBaseSchema):",
+          "class PostWithUserSchema(PostResponseSchema):",
+          "class PostStatsSchema(BaseModel):",
+          "class PostDetailSchema(PostWithUserSchema):"
+        ],
+        "routes": [],
+        "line_count": 58,
+        "complexity_score": 7
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_post_schemas.py",
+        "test_count": 23
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/schemas/comment_schemas.py",
+      "analysis": {
+        "file_path": "app/schemas/comment_schemas.py",
+        "file_name": "comment_schemas",
+        "file_type": "schema",
+        "functions": [],
+        "classes": [
+          "class CommentBaseSchema(BaseModel):",
+          "class CommentCreateSchema(CommentBaseSchema):",
+          "class CommentUpdateSchema(BaseModel):",
+          "class CommentResponseSchema(CommentBaseSchema):",
+          "class CommentWithUserSchema(CommentResponseSchema):",
+          "class CommentStatsSchema(BaseModel):",
+          "class CommentDetailSchema(CommentWithUserSchema):"
+        ],
+        "routes": [],
+        "line_count": 67,
+        "complexity_score": 7
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_comment_schemas.py",
+        "test_count": 20
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/schemas/like_schemas.py",
+      "analysis": {
+        "file_path": "app/schemas/like_schemas.py",
+        "file_name": "like_schemas",
+        "file_type": "schema",
+        "functions": [],
+        "classes": [
+          "class LikeCreateSchema(BaseModel):",
+          "class LikeResponseSchema(BaseModel):",
+          "class LikeWithUserSchema(LikeResponseSchema):",
+          "class LikeStatsSchema(BaseModel):"
+        ],
+        "routes": [],
+        "line_count": 47,
+        "complexity_score": 4
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_like_schemas.py",
+        "test_count": 16
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/utils/api_utils.py",
+      "analysis": {
+        "file_path": "app/utils/api_utils.py",
+        "file_name": "api_utils",
+        "file_type": "util",
+        "functions": [
+          "def __init__(self, message: str, status_code: int = 400, errors: List[str] = None):",
+          "def __init__(self, message: str = \"Validation failed\", errors: List[str] = None):",
+          "def __init__(self, message: str = \"Resource not found\"):",
+          "def __init__(self, message: str = \"Unauthorized\"):",
+          "def __init__(self, message: str = \"Forbidden\"):",
+          "def handle_validation_error(e: ValidationError) -> tuple[dict, int]:",
+          "def handle_integrity_error(e: IntegrityError) -> tuple[dict, int]:",
+          "def handle_api_error(e: APIError) -> tuple[dict, int]:",
+          "def success_response(data: Any = None, message: str = \"Success\") -> dict:",
+          "def error_response(message: str, errors: List[str] = None, status_code: int = 400) -> tuple[dict, int]:"
+        ],
+        "classes": [
+          "class APIError(Exception):",
+          "class ValidationAPIError(APIError):",
+          "class NotFoundAPIError(APIError):",
+          "class UnauthorizedAPIError(APIError):",
+          "class ForbiddenAPIError(APIError):"
+        ],
+        "routes": [],
+        "line_count": 121,
+        "complexity_score": 15
+      },
+      "test_info": {
+        "exists": true,
+        "path": "app/tests/test_api_utils.py",
+        "test_count": 29
+      },
+      "needs_work": false
+    },
+    {
+      "file_path": "app/utils/caching.py",
+      "analysis": {
+        "file_path": "app/utils/caching.py",
+        "file_name": "caching",
+        "file_type": "util",
+        "functions": [
+          "def __init__(self):",
+          "def init_app(self, app):",
+          "def _make_key(self, key: str) -> str:",
+          "def get(self, key: str, default=None) -> Any:",
+          "def set(self, key: str, value: Any, timeout: Optional[int] = None) -> bool:",
+          "def delete(self, key: str) -> bool:",
+          "def delete_pattern(self, pattern: str) -> int:",
+          "def clear_all(self) -> bool:",
+          "def get_stats(self) -> Dict[str, Any]:",
+          "def cache_key(*args, **kwargs) -> str:",
+          "def cached(timeout: Optional[int] = None, key_func: Optional[Callable] = None):",
+          "def decorator(func: Callable) -> Callable:",
+          "def wrapper(*args, **kwargs):",
+          "def smart_cached(cache_type: str):",
+          "def decorator(func: Callable) -> Callable:",
+          "def wrapper(*args, **kwargs):",
+          "def invalidate_cache_pattern(pattern: str):",
+          "def invalidate_user_cache(user_id: int):",
+          "def invalidate_post_cache(post_id: int):"
+        ],
+        "classes": [
+          "class CacheManager:"
+        ],
+        "routes": [],
+        "line_count": 284,
+        "complexity_score": 20
+      },
+      "test_info": {
+        "exists": false,
+        "path": "app/tests/test_caching.py",
+        "test_count": 0
+      },
+      "needs_work": true
+    },
+    {
+      "file_path": "app/utils/rate_limiting.py",
+      "analysis": {
+        "file_path": "app/utils/rate_limiting.py",
+        "file_name": "rate_limiting",
+        "file_type": "util",
+        "functions": [
+          "def __init__(self):",
+          "def init_app(self, app):",
+          "def _get_rate_limit_key(self) -> str:",
+          "def _on_rate_limit_exceeded(self, e):",
+          "def rate_limit(limit: str, per_user: bool = True):",
+          "def decorator(func: Callable) -> Callable:",
+          "def wrapper(*args, **kwargs):",
+          "def smart_rate_limit(endpoint_name: str):",
+          "def decorator(func: Callable) -> Callable:",
+          "def wrapper(*args, **kwargs):",
+          "def get_rate_limit_status(user_id: Optional[str] = None) -> dict:",
+          "def reset_rate_limit(user_id: Optional[str] = None) -> bool:"
+        ],
+        "classes": [
+          "class RateLimitManager:"
+        ],
+        "routes": [],
+        "line_count": 195,
+        "complexity_score": 13
+      },
+      "test_info": {
+        "exists": false,
+        "path": "app/tests/test_rate_limiting.py",
+        "test_count": 0
+      },
+      "needs_work": true
+    },
+    {
+      "file_path": "app/utils/documentation.py",
+      "analysis": {
+        "file_path": "app/utils/documentation.py",
+        "file_name": "documentation",
+        "file_type": "util",
+        "functions": [
+          "def __init__(self):",
+          "def init_app(self, app):",
+          "def register_spec(self, endpoint: str, spec: Dict[str, Any]):",
+          "def api_doc(",
+          "def decorator(func):",
+          "def wrapper(*args, **kwargs):",
+          "def auth_doc(summary: str, description: Optional[str] = None, **kwargs):",
+          "def decorator(func):",
+          "def post_doc(summary: str, description: Optional[str] = None, requires_auth: bool = True):",
+          "def user_doc(summary: str, description: Optional[str] = None, requires_auth: bool = True):",
+          "def paginated_doc(summary: str, description: Optional[str] = None):",
+          "def file_upload_doc(summary: str, description: Optional[str] = None):"
+        ],
+        "classes": [
+          "class APIDocumentationManager:"
+        ],
+        "routes": [],
+        "line_count": 393,
+        "complexity_score": 13
+      },
+      "test_info": {
+        "exists": false,
+        "path": "app/tests/test_documentation.py",
+        "test_count": 0
+      },
+      "needs_work": true
+    }
+  ],
+  "processing_order": [
+    "app/api/auth_routes.py",
+    "app/api/user_routes.py",
+    "app/api/post_routes.py",
+    "app/api/comment_routes.py",
+    "app/api/like_routes.py",
+    "app/api/follow_routes.py",
+    "app/api/aws_routes.py",
+    "app/api/search_routes.py",
+    "app/api/profile_routes.py",
+    "app/api/note_routes.py",
+    "app/models/user.py",
+    "app/models/post.py",
+    "app/models/comment.py",
+    "app/models/like.py",
+    "app/models/follow.py",
+    "app/schemas/auth_schemas.py",
+    "app/schemas/user_schemas.py",
+    "app/schemas/post_schemas.py",
+    "app/schemas/comment_schemas.py",
+    "app/schemas/like_schemas.py",
+    "app/utils/api_utils.py",
+    "app/utils/caching.py",
+    "app/utils/rate_limiting.py",
+    "app/utils/documentation.py"
+  ]
+}

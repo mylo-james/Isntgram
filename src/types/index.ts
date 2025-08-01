@@ -1,133 +1,76 @@
 // Core Application Types for Isntgram
+// Backend-aligned types that match the API schemas after middleware conversion
 
-export interface User {
-  id: number;
-  username: string;
-  email?: string;
-  profileImageUrl?: string;
-  bio?: string;
-  fullName?: string;
-  posts?: Post[];
-  followers?: Follow[];
-  following?: Follow[];
-}
+// ============================================================================
+// API TYPES (Backend-aligned)
+// ============================================================================
 
-export interface Post {
-  id: number;
-  imageUrl: string;
-  caption: string;
-  createdAt: string;
-  updatedAt: string;
-  userId: number;
-  user?: User;
-  comments?: Comment[];
-  likes?: Like[];
-  likeCount?: number;
-  commentCount?: number;
-}
+// Re-export all types from api.ts for easy access
+export * from './api';
 
-export interface Comment {
-  id: number;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  postId: number;
-  userId: number;
-  user: User;
-  likes?: Like[];
-  likesCount?: number;
-}
+// ============================================================================
+// CONTEXT TYPES
+// ============================================================================
 
-export interface Like {
-  id: number;
-  userId: number;
-  user: User;
-  likeableId: number;
-  likeableType: 'post' | 'comment';
-  createdAt: string;
-}
+import type { User, Post } from './api';
 
-export interface Follow {
-  id: number;
-  userId: number;
-  userFollowedId: number;
-  user: User;
-  userFollowed: User;
-  createdAt: string;
-}
-
-export interface Notification {
-  id: number;
-  type: 'like' | 'comment' | 'follow';
-  read: boolean;
-  createdAt: string;
-  userId: number;
-  user: User;
-  relatedId?: number;
-  relatedUser?: User;
-  post?: Post;
-  comment?: Comment;
-}
-
-// API Response Types
-export interface APIResponse<T> {
-  data?: T;
-  error?: string;
-  message?: string;
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  hasMore: boolean;
-  nextOffset?: number;
-}
-
-// Context Types
 export interface UserContextType {
   currentUser: User | null;
   setCurrentUser: (_user: User | null) => void;
   isAuthenticated: boolean;
 }
 
+// Posts context expects Record<number, Post> (object with post IDs as keys)
 export interface PostsContextType {
-  posts: Post[];
-  setPosts: (_posts: Post[]) => void;
-  addPost: (_post: Post) => void;
-  updatePost: (_postId: number, _updatedPost: Partial<Post>) => void;
-  deletePost: (_postId: number) => void;
+  posts: Record<number, Post>;
+  setPosts: React.Dispatch<React.SetStateAction<Record<number, Post>>>;
+  postOrder: Set<number>;
+  setPostOrder: React.Dispatch<React.SetStateAction<Set<number>>>;
+}
+
+// Like context expects Record<string, LikeObject> | null
+export interface LikeObject {
+  id: number;
+  userId: number;
+  postId?: number;
+  commentId?: number;
 }
 
 export interface LikeContextType {
-  likedPosts: Set<number>;
-  likedComments: Set<number>;
-  togglePostLike: (_postId: number) => void;
-  toggleCommentLike: (_commentId: number) => void;
+  likes: Record<string, LikeObject> | null;
+  setLikes: React.Dispatch<
+    React.SetStateAction<Record<string, LikeObject> | null>
+  >;
 }
 
-export interface ProfileContextType {
-  profileUser: User | null;
-  setProfileUser: (_user: User | null) => void;
-  isLoading: boolean;
-  setIsLoading: (_loading: boolean) => void;
-}
-
+// Follow context expects Set<number>
 export interface FollowContextType {
-  followingUsers: Set<number>;
-  toggleFollow: (_userId: number) => void;
-  isFollowing: (_userId: number) => boolean;
+  follows: Set<number>;
+  setFollows: React.Dispatch<React.SetStateAction<Set<number>>>;
 }
 
-// Form Types
+// Profile context expects User | null
+export interface ProfileContextType {
+  profileData: User | null;
+  setProfileData: React.Dispatch<React.SetStateAction<User | null>>;
+}
+
+// ============================================================================
+// FORM TYPES
+// ============================================================================
+
 export interface LoginFormData {
-  username: string;
+  email: string;
   password: string;
 }
 
 export interface SignupFormData {
   username: string;
   email: string;
+  fullName: string;
   password: string;
   passwordConfirm: string;
+  bio?: string;
 }
 
 export interface PostFormData {
@@ -139,5 +82,43 @@ export interface CommentFormData {
   content: string;
 }
 
-// Re-export component types for convenience
-// export * from './components'; // Removed - unused interfaces
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
+export const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffHours < 1) {
+    return 'Just now';
+  } else if (diffHours < 24) {
+    return `${diffHours}h`;
+  } else if (diffDays < 7) {
+    return `${diffDays}d`;
+  } else {
+    return date.toLocaleDateString();
+  }
+};
+
+export const isValidImageFile = (file: File): boolean => {
+  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  const maxSize = 5 * 1024 * 1024; // 5MB
+
+  return validTypes.includes(file.type) && file.size <= maxSize;
+};
+
+export const getAuthToken = (): string | null => {
+  return localStorage.getItem('Isntgram_access_token');
+};
+
+export const setAuthToken = (token: string): void => {
+  localStorage.setItem('Isntgram_access_token', token);
+};
+
+export const removeAuthToken = (): void => {
+  localStorage.removeItem('Isntgram_access_token');
+};

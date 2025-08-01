@@ -2,8 +2,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from '../hooks/useContexts';
 import { ProfileContext } from '../Contexts/profileContext';
-import { apiCall } from '../utils/apiMiddleware';
+import { useApi } from '../utils/apiComposable';
 import { Follow } from '../types';
+import type { FollowUserRequest } from '../types/api';
 
 interface User {
   id: number;
@@ -26,6 +27,14 @@ const DynamicModal: React.FC<DynamicModalProps> = (props) => {
 
   const { currentUser } = useUser();
   const profileContext = useContext(ProfileContext);
+  const {
+    followUser,
+    unfollowUser,
+    getFollowing,
+    isLoading,
+    error,
+    clearError,
+  } = useApi();
 
   if (!profileContext) {
     throw new Error(
@@ -40,19 +49,29 @@ const DynamicModal: React.FC<DynamicModalProps> = (props) => {
     if (!currentUser?.id) {
       return;
     }
-    (async () => {
-      try {
-        const { users } = (await apiCall(
-          `/api/follow/${currentUser.id}/following`
-        )) as { users: User[] };
 
-        const userIds = users.map((user: User) => user.id);
-        setCurrentUserFollows(userIds);
-      } catch {
-        // console.error(e);
+    const loadFollowing = async () => {
+      try {
+        const response = await getFollowing(currentUser.id);
+
+        if (response.error) {
+          console.error('Failed to load following:', response.error);
+          return;
+        }
+
+        if (response.data?.follows) {
+          const userIds = response.data.follows.map(
+            (follow: Follow) => follow.userFollowedId
+          );
+          setCurrentUserFollows(userIds);
+        }
+      } catch (error) {
+        console.error('Error loading following:', error);
       }
-    })();
-  }, [currentUser?.id]);
+    };
+
+    loadFollowing();
+  }, [currentUser?.id, getFollowing]);
 
   useEffect(() => {
     let url;
@@ -72,94 +91,124 @@ const DynamicModal: React.FC<DynamicModalProps> = (props) => {
     if (!endpoint) {
       return;
     }
-    (async () => {
-      try {
-        const { users } = (await apiCall(`/api/${endpoint}`)) as {
-          users: User[];
-        };
 
-        setUserArray(users);
-      } catch {
-        // console.error(e);
+    const loadUsers = async () => {
+      try {
+        // Note: This endpoint might need to be added to the composable
+        // For now, we'll use a direct fetch with better error handling
+        const response = await fetch(`/api/${endpoint}`);
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch users: ${response.status}`);
+        }
+
+        const responseData = (await response.json()) as { users: User[] };
+        setUserArray(responseData.users);
+      } catch (error) {
+        console.error('Error loading users:', error);
       }
-    })();
+    };
+
+    loadUsers();
   }, [currentUserFollows, endpoint]);
 
-  const followUser = async (
+  const handleFollowUser = async (
     e: React.MouseEvent<HTMLButtonElement>,
     userFollowedId: number
   ) => {
     e.preventDefault();
     if (!currentUser?.id) return;
 
-    const body = { userId: currentUser.id, userFollowedId };
+    clearError();
+
+    const followRequest: FollowUserRequest = {
+      userId: currentUser.id,
+      userFollowedId: userFollowedId,
+    };
+
     try {
-      const followResponse = (await apiCall('/api/follow', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      })) as Follow;
+      const response = await followUser(followRequest);
 
-      setCurrentUserFollows([...currentUserFollows, userFollowedId]);
-
-      if (profileData?.id === currentUser?.id) {
-        const updatedFollowingList = [
-          ...(profileData.following ?? []),
-          followResponse,
-        ];
-        setProfileData({
-          ...profileData,
-          following: updatedFollowingList,
-        });
+      if (response.error) {
+        console.error('Failed to follow user:', response.error);
+        return;
       }
-    } catch {
-      // console.error(e);
+
+      if (response.data?.follow) {
+        setCurrentUserFollows([...currentUserFollows, userFollowedId]);
+
+        if (profileData?.id === currentUser?.id) {
+          const updatedFollowingList = [
+            ...(profileData.following ?? []),
+            response.data.follow,
+          ];
+          setProfileData({
+            ...profileData,
+            following: updatedFollowingList,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error following user:', error);
     }
   };
 
-  const unfollowUser = async (
+  const handleUnfollowUser = async (
     e: React.MouseEvent<HTMLButtonElement>,
     userFollowedId: number
   ) => {
     e.preventDefault();
     if (!currentUser?.id) return;
 
-    const body = { userId: currentUser.id, userFollowedId };
+    clearError();
+
+    const unfollowRequest: FollowUserRequest = {
+      userId: currentUser.id,
+      userFollowedId: userFollowedId,
+    };
+
     try {
-      const { userFollowedId: id } = (await apiCall('/api/follow', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      })) as { userFollowedId: number };
+      const response = await unfollowUser(unfollowRequest);
+
+      if (response.error) {
+        console.error('Failed to unfollow user:', response.error);
+        return;
+      }
 
       const currentUserFollowsCopy = [...currentUserFollows];
-      const index = currentUserFollowsCopy.indexOf(id);
-      currentUserFollowsCopy.splice(index, 1);
+      const index = currentUserFollowsCopy.indexOf(userFollowedId);
+      if (index > -1) {
+        currentUserFollowsCopy.splice(index, 1);
+      }
 
       setCurrentUserFollows(currentUserFollowsCopy);
 
       if (profileData?.id === currentUser?.id) {
         const updatedFollowingList = (profileData.following ?? []).filter(
-          (user: Follow) => user.userFollowedId !== id
+          (user: Follow) => user.userFollowedId !== userFollowedId
         );
         setProfileData({
           ...profileData,
           following: updatedFollowingList,
         });
       }
-    } catch {
-      // console.error(e);
+    } catch (error) {
+      console.error('Error unfollowing user:', error);
     }
   };
+
   if (!profileData) {
     return null;
   }
+
   return (
     <div className='flex flex-col bg-white h-[362px] max-h-[362px] w-[260px] sm:w-[400px] rounded-xl'>
+      {error && (
+        <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm mb-4'>
+          {error}
+        </div>
+      )}
+
       <h1 className='px-8 pt-8 pb-4 border-b border-gray-300 m-0 text-gray-800 text-base font-bold text-center'>
         {title}
       </h1>
@@ -194,17 +243,19 @@ const DynamicModal: React.FC<DynamicModalProps> = (props) => {
               ''
             ) : currentUserFollows.includes(id) ? (
               <button
-                onClick={(e) => unfollowUser(e, id)}
-                className='px-4 py-1.5 bg-white text-gray-800 font-bold border border-gray-300 rounded cursor-pointer text-sm hover:bg-gray-50 transition-colors outline-none'
+                onClick={(e) => handleUnfollowUser(e, id)}
+                className='px-4 py-1.5 bg-white text-gray-800 font-bold border border-gray-300 rounded cursor-pointer text-sm hover:bg-gray-50 transition-colors outline-none disabled:opacity-50 disabled:cursor-not-allowed'
+                disabled={isLoading}
               >
-                Following
+                {isLoading ? 'Unfollowing...' : 'Following'}
               </button>
             ) : (
               <button
-                onClick={(e) => followUser(e, id)}
-                className='px-4 py-1.5 bg-blue-500 text-white font-bold border-none rounded cursor-pointer text-sm hover:bg-blue-600 transition-colors'
+                onClick={(e) => handleFollowUser(e, id)}
+                className='px-4 py-1.5 bg-blue-500 text-white font-bold border-none rounded cursor-pointer text-sm hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+                disabled={isLoading}
               >
-                Follow
+                {isLoading ? 'Following...' : 'Follow'}
               </button>
             )}
           </div>

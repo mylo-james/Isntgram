@@ -6,76 +6,65 @@ import PostCommentSection from '../components/Post/PostCommentSection';
 import CommentInputField from '../components/Post/CommentInputField';
 import { useParams } from 'react-router-dom';
 import { usePosts } from '../hooks/useContexts';
-import { Post } from '../types';
-import { apiCall } from '../utils/apiMiddleware';
+import { Post, PostDetail } from '../types';
+import { useApi } from '../utils/apiComposable';
 
 const SinglePost: React.FC = () => {
-  const { posts, setPosts } = usePosts();
-  const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const { postId } = useParams<{ postId?: string }>();
+  const { posts } = usePosts();
+  const { getPost } = useApi();
+  const [post, setPost] = useState<PostDetail | null>(null);
 
   useEffect(() => {
     if (!postId) return;
 
-    (async () => {
-      setIsLoaded(false);
+    const loadPost = async () => {
       try {
-        const response = (await apiCall(`/api/post/${postId}`)) as {
-          post: Post;
-        };
-
-        const { post } = response;
-        setPosts((currentPosts) => ({ ...currentPosts, [post.id]: post }));
-        setIsLoaded(true);
-      } catch {
-        // console.error(error);
+        const response = await getPost(parseInt(postId));
+        if (response.data?.post) {
+          setPost(response.data.post);
+        }
+      } catch (error) {
+        console.error('Error loading post:', error);
       }
-    })();
-  }, [postId, setPosts]);
+    };
 
-  if (!isLoaded || !postId) {
-    return (
-      <div className='flex justify-center items-center min-h-screen'>
-        <div className='text-gray-500'>Loading...</div>
-      </div>
-    );
-  }
-
-  const post = posts[parseInt(postId)];
+    // First try to get from context
+    const contextPost = posts[parseInt(postId)] as PostDetail | undefined;
+    if (contextPost?.user) {
+      setPost(contextPost);
+    } else {
+      // If not in context, fetch from API
+      loadPost();
+    }
+  }, [postId, posts, getPost]);
 
   if (!post?.user) {
-    return (
-      <div className='flex justify-center items-center min-h-screen'>
-        <div className='text-gray-500'>Post not found</div>
-      </div>
-    );
+    return <div>Loading...</div>;
   }
 
+  const postUser = {
+    id: post.user.id,
+    username: post.user.username,
+  };
+
   return (
-    <div className='w-full max-w-[600px] my-14 mx-auto bg-white border-t border-gray-300 sm:border sm:border-gray-300 sm:mt-20 sm:rounded-sm'>
-      <PostHeader
-        id={post.id}
-        user={{
-          id: post.user.id,
-          profileImageUrl: post.user.profileImageUrl ?? '',
-          username: post.user.username ?? '',
-        }}
-      />
-      <PhotoImagePost id={parseInt(postId)} postImg={post.imageUrl} />
-      <IconPost isSinglePost={true} {...post} />
-      <PostCommentSection
-        id={post.id}
-        user={{
-          id: post.user.id,
-          username: post.user.username ?? '',
-        }}
-        comments={post.comments ?? []}
-        createdAt={post.createdAt}
-        isSinglePost={true}
-        likes={post.likes ?? []}
-        caption={post.caption}
-      />
-      <CommentInputField id={post.id} isSinglePost={true} />
+    <div className='flex flex-col items-center min-h-screen pt-14 sm:pt-20'>
+      <div className='w-full max-w-[600px] bg-white sm:border sm:border-gray-300 sm:rounded-sm'>
+        <PostHeader id={post.id} user={post.user} />
+        <PhotoImagePost id={parseInt(postId!)} postImg={post.imageUrl} />
+        <IconPost isSinglePost={true} {...post} />
+        <PostCommentSection
+          id={post.id}
+          user={postUser}
+          comments={post.comments ?? []}
+          createdAt={post.createdAt}
+          isSinglePost={true}
+          likes={post.likes ?? []}
+          caption={post.caption ?? ''}
+        />
+        <CommentInputField id={post.id} isSinglePost={true} />
+      </div>
     </div>
   );
 };

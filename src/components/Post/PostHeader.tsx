@@ -3,18 +3,13 @@ import ModalPost from './ModalPost';
 import Modal from 'react-modal';
 import { AiOutlineEllipsis } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
+import { UserPublic } from '../../types';
 
 Modal.setAppElement('#root');
 
-interface PostUser {
-  profileImageUrl: string;
-  username: string;
-  id: number;
-}
-
 interface PostHeaderProps {
   id: number;
-  user: PostUser;
+  user: UserPublic;
 }
 
 const PostHeader: React.FC<PostHeaderProps> = ({
@@ -51,7 +46,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
         <Link to={`/profile/${username}`}>
           <img
             className='flex h-9 w-9 rounded-full overflow-hidden justify-center items-center'
-            src={userPic}
+            src={userPic || '/default-profile.png'}
             alt='profile'
           />
         </Link>

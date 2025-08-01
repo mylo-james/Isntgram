@@ -5,8 +5,9 @@ import { useUser, useProfile } from '../../hooks/useContexts';
 import ProfilePicModal from './ProfilePicModal';
 import { RiLogoutBoxRLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
-import { apiCall } from '../../utils/apiMiddleware';
-import { Follow } from '../../types';
+import { useApi } from '../../utils/apiComposable';
+import { Follow, User } from '../../types';
+import type { FollowUserRequest } from '../../types/api';
 
 Modal.setAppElement('#root');
 
@@ -16,6 +17,15 @@ interface ProfileHeaderProps {
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({ windowSize }) => {
   const { currentUser } = useUser();
+  const {
+    logout,
+    followUser,
+    unfollowUser,
+    getFollowing,
+    isLoading,
+    error,
+    clearError,
+  } = useApi();
 
   // modals
   const [isFollowersOpen, setIsFollowersOpen] = useState<boolean>(false);
@@ -33,22 +43,29 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ windowSize }) => {
   useEffect(() => {
     if (!currentUser?.id || !profileData) return;
 
-    (async () => {
+    const loadFollowing = async () => {
       try {
-        const { follows: currentUserFollowing } = (await apiCall(
-          `/api/follow/${currentUser.id}/following`
-        )) as { follows: Follow[] };
+        const response = await getFollowing(currentUser.id);
 
-        const followingList: number[] = [];
-        currentUserFollowing.forEach((follow: Follow) => {
-          followingList.push(follow.userFollowedId);
-        });
-        setCurrentUserFollowingList(followingList);
-      } catch {
-        // console.error(e);
+        if (response.error) {
+          console.error('Failed to load following:', response.error);
+          return;
+        }
+
+        if (response.data?.follows) {
+          const followingList: number[] = [];
+          response.data.follows.forEach((follow: Follow) => {
+            followingList.push(follow.userFollowedId);
+          });
+          setCurrentUserFollowingList(followingList);
+        }
+      } catch (error) {
+        console.error('Error loading following:', error);
       }
-    })();
-  }, [profileData, currentUser?.id]);
+    };
+
+    loadFollowing();
+  }, [profileData, currentUser?.id, getFollowing]);
 
   if (!profileData) {
     return null;
@@ -59,7 +76,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ windowSize }) => {
     bio,
     profileImageUrl: profileImg,
     username,
-    posts: userPosts,
+    posts: userPosts = [],
+    followers: userFollowers = [],
+    following: userFollowing = [],
   } = profileData;
 
   const numPosts = userPosts?.length ?? 0;
@@ -97,55 +116,79 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ windowSize }) => {
     setIsEditProfilePicOpen(true);
   };
 
-  const logOut = async () => {
-    await apiCall('/api/auth/logout');
-    window.location.reload();
-  };
-
-  const followUser = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    const body = { userId: currentUser?.id, userFollowedId: profileId };
+  const handleLogOut = async () => {
+    clearError();
     try {
-      const response = (await apiCall('/api/follow', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      })) as Follow;
-
-      const updatesList = [...(profileData.followers ?? []), response];
-      setProfileData({
-        ...profileData,
-        followers: updatesList,
-      });
-    } catch {
-      // console.error(e);
+      const response = await logout();
+      if (response.error) {
+        console.error('Logout failed:', response.error);
+        return;
+      }
+      window.location.reload();
+    } catch (error) {
+      console.error('Error during logout:', error);
     }
   };
 
-  const unfollowUser = async (e: React.MouseEvent) => {
+  const handleFollowUser = async (e: React.MouseEvent) => {
     e.preventDefault();
-    const body = { userId: currentUser?.id, userFollowedId: profileId };
-    try {
-      const response = (await apiCall('/api/follow', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      })) as { userId: number };
-      const { userId: deletedId } = response;
+    if (!currentUser?.id) return;
 
-      const filteredList = (profileData.followers ?? []).filter(
-        (user: Follow) => user.userId !== deletedId
+    clearError();
+
+    const followRequest: FollowUserRequest = {
+      userId: currentUser.id,
+      userFollowedId: profileId,
+    };
+
+    try {
+      const response = await followUser(followRequest);
+
+      if (response.error) {
+        console.error('Failed to follow user:', response.error);
+        return;
+      }
+
+      if (response.data?.follow) {
+        const updatesList = [...userFollowers, response.data.follow];
+        setProfileData({
+          ...profileData,
+          followers: updatesList,
+        });
+      }
+    } catch (error) {
+      console.error('Error following user:', error);
+    }
+  };
+
+  const handleUnfollowUser = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!currentUser?.id) return;
+
+    clearError();
+
+    const unfollowRequest: FollowUserRequest = {
+      userId: currentUser.id,
+      userFollowedId: profileId,
+    };
+
+    try {
+      const response = await unfollowUser(unfollowRequest);
+
+      if (response.error) {
+        console.error('Failed to unfollow user:', response.error);
+        return;
+      }
+
+      const filteredList = userFollowers.filter(
+        (user: Follow) => user.userId !== currentUser.id
       );
       setProfileData({
         ...profileData,
         followers: filteredList,
       });
-    } catch {
-      // console.error(e);
+    } catch (error) {
+      console.error('Error unfollowing user:', error);
     }
   };
 
@@ -155,6 +198,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ windowSize }) => {
 
   return (
     <>
+      {error && (
+        <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm mb-4'>
+          {error}
+        </div>
+      )}
+
       {windowSize < 640 ? (
         <div className='flex h-[82px] mx-4 my-7'>
           <div
@@ -175,7 +224,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ windowSize }) => {
           >
             <img
               className='w-full h-full object-cover'
-              src={profileImg}
+              src={profileImg || '/default-profile.png'}
               alt='avatar'
             />
             {isEditProfilePicOpen ? (
@@ -193,7 +242,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ windowSize }) => {
                 {username}
               </div>
               {currentUser?.id === profileId ? (
-                <RiLogoutBoxRLine onClick={logOut} className='cursor-pointer' />
+                <RiLogoutBoxRLine
+                  onClick={handleLogOut}
+                  className='cursor-pointer'
+                />
               ) : (
                 ''
               )}
@@ -206,17 +258,19 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ windowSize }) => {
               </Link>
             ) : currentUserFollowingList.includes(profileId) ? (
               <button
-                className='w-[85px] h-7.5 bg-transparent px-2 py-1 border border-gray-300 rounded-sm text-sm font-bold hover:bg-gray-50 transition-colors'
-                onClick={unfollowUser}
+                className='w-[85px] h-7.5 bg-transparent px-2 py-1 border border-gray-300 rounded-sm text-sm font-bold hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+                onClick={handleUnfollowUser}
+                disabled={isLoading}
               >
-                Following{' '}
+                {isLoading ? 'Unfollowing...' : 'Following'}
               </button>
             ) : (
               <button
-                className='w-[85px] h-7.5 bg-blue-500 text-white px-2 py-1 border-none rounded-sm text-sm font-bold outline-none hover:bg-blue-600 transition-colors'
-                onClick={followUser}
+                className='w-[85px] h-7.5 bg-blue-500 text-white px-2 py-1 border-none rounded-sm text-sm font-bold outline-none hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+                onClick={handleFollowUser}
+                disabled={isLoading}
               >
-                Follow
+                {isLoading ? 'Following...' : 'Follow'}
               </button>
             )}
           </section>
@@ -241,7 +295,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ windowSize }) => {
           >
             <img
               className='w-20 h-20 sm:w-32 sm:h-32 lg:w-40 lg:h-40 object-cover'
-              src={profileImg}
+              src={profileImg || '/default-profile.png'}
               alt='avatar'
             />
           </div>
@@ -264,23 +318,25 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ windowSize }) => {
                 </Link>
               ) : currentUserFollowingList.includes(profileId) ? (
                 <button
-                  className='px-4 py-1.5 border border-gray-300 rounded text-sm font-medium hover:bg-gray-50'
-                  onClick={unfollowUser}
+                  className='px-4 py-1.5 border border-gray-300 rounded text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                  onClick={handleUnfollowUser}
+                  disabled={isLoading}
                 >
-                  Following
+                  {isLoading ? 'Unfollowing...' : 'Following'}
                 </button>
               ) : (
                 <button
-                  className='px-4 py-1.5 bg-blue-500 text-white rounded text-sm font-medium hover:bg-blue-600'
-                  onClick={followUser}
+                  className='px-4 py-1.5 bg-blue-500 text-white rounded text-sm font-medium hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed'
+                  onClick={handleFollowUser}
+                  disabled={isLoading}
                 >
-                  Follow
+                  {isLoading ? 'Following...' : 'Follow'}
                 </button>
               )}
               {currentUser?.id === profileId ? (
                 <RiLogoutBoxRLine
                   className='text-xl cursor-pointer hover:text-gray-600'
-                  onClick={logOut}
+                  onClick={handleLogOut}
                 />
               ) : (
                 ''
@@ -303,7 +359,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ windowSize }) => {
                 tabIndex={0}
               >
                 <span className='font-semibold'>
-                  {profileData.followers?.length ?? 0}
+                  {userFollowers?.length ?? 0}
                 </span>{' '}
                 followers
               </div>
@@ -320,7 +376,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ windowSize }) => {
                 tabIndex={0}
               >
                 <span className='font-semibold'>
-                  {profileData.following?.length ?? 0}
+                  {userFollowing?.length ?? 0}
                 </span>{' '}
                 following
               </div>

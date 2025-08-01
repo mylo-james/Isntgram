@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useUser } from '../../hooks/useContexts';
 import { Post } from '../../types';
-import { apiCall } from '../../utils/apiMiddleware';
+import { useApi } from '../../utils/apiComposable';
 
 import Layout1 from './Layout1';
 import Layout2 from './Layout2';
@@ -10,6 +10,7 @@ import Layout3 from './Layout3';
 
 const ExploreGrid: React.FC = () => {
   const { currentUser } = useUser();
+  const { getExplorePosts, isLoading, error } = useApi();
 
   const [toRender, setToRender] = useState<React.ReactElement[]>([]);
   const [hasMore, setHasMore] = useState<boolean>(true);
@@ -47,10 +48,14 @@ const ExploreGrid: React.FC = () => {
 
     try {
       while (componentsLoaded < minComponentsNeeded && stillHasMore) {
-        const obj = (await apiCall(`/api/post/explore/${currentOffset}`)) as {
-          posts: Post[];
-        };
-        const photoArray = obj.posts;
+        const response = await getExplorePosts(currentOffset);
+
+        if (response.error) {
+          console.error('Failed to load explore posts:', response.error);
+          break;
+        }
+
+        const photoArray = response.data?.posts || [];
 
         if (photoArray.length === 0) {
           stillHasMore = false;
@@ -75,8 +80,8 @@ const ExploreGrid: React.FC = () => {
       totalPostsLoadedRef.current = currentOffset;
       setHasMore(stillHasMore);
       initialLoadCompleteRef.current = true;
-    } catch {
-      // console.error('Error during bulk load:', error);
+    } catch (error) {
+      console.error('Error during bulk load:', error);
       setHasMore(false);
     } finally {
       setLoading(false);
@@ -115,7 +120,7 @@ const ExploreGrid: React.FC = () => {
     ];
   }
 
-  const fetchMore = () => {
+  const fetchMore = async () => {
     if (
       (!currentUser?.id || loading) ??
       fetchingRef.current ??
@@ -131,44 +136,49 @@ const ExploreGrid: React.FC = () => {
     const currentOffset = totalPostsLoadedRef.current;
     totalPostsLoadedRef.current = currentOffset + 3; // Reserve 3 spots optimistically
 
-    (async () => {
-      try {
-        const obj = (await apiCall(`/api/post/explore/${currentOffset}`)) as {
-          posts: Post[];
-        };
-        const photoArray = obj.posts;
+    try {
+      const response = await getExplorePosts(currentOffset);
 
-        if (photoArray.length === 0) {
-          totalPostsLoadedRef.current = currentOffset; // Reset
-          setHasMore(false);
-          setLoading(false);
-          fetchingRef.current = false;
-          return;
-        }
-
-        if (photoArray.length < 3) {
-          setHasMore(false);
-        }
-
-        // Adjust the counter to the actual number received
-        totalPostsLoadedRef.current = currentOffset + photoArray.length;
-
-        const componentToRender = getTemplate(photoArray);
-
-        setToRender((prevToRender) => {
-          const newToRender = [...prevToRender, ...componentToRender];
-          return newToRender;
-        });
-
-        setLoading(false);
-        fetchingRef.current = false;
-      } catch {
-        // console.error('Error fetching more posts:', error);
+      if (response.error) {
+        console.error('Failed to fetch more posts:', response.error);
         setHasMore(false);
         setLoading(false);
         fetchingRef.current = false;
+        return;
       }
-    })();
+
+      const photoArray = response.data?.posts || [];
+
+      if (photoArray.length === 0) {
+        totalPostsLoadedRef.current = currentOffset; // Reset
+        setHasMore(false);
+        setLoading(false);
+        fetchingRef.current = false;
+        return;
+      }
+
+      if (photoArray.length < 3) {
+        setHasMore(false);
+      }
+
+      // Adjust the counter to the actual number received
+      totalPostsLoadedRef.current = currentOffset + photoArray.length;
+
+      const componentToRender = getTemplate(photoArray);
+
+      setToRender((prevToRender) => {
+        const newToRender = [...prevToRender, ...componentToRender];
+        return newToRender;
+      });
+
+      setLoading(false);
+      fetchingRef.current = false;
+    } catch (error) {
+      console.error('Error fetching more posts:', error);
+      setHasMore(false);
+      setLoading(false);
+      fetchingRef.current = false;
+    }
   };
 
   if (!currentUser?.id) {
@@ -177,6 +187,11 @@ const ExploreGrid: React.FC = () => {
 
   return (
     <div key='gridWrapper' className='mx-auto mb-[10vh] w-[95vw] max-w-[614px]'>
+      {error && (
+        <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm mb-4'>
+          {error}
+        </div>
+      )}
       <InfiniteScroll
         dataLength={toRender.length}
         next={fetchMore}

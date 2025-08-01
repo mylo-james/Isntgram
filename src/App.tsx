@@ -12,7 +12,7 @@ import EditProfile from './components/Profile/EditProfile';
 import SinglePost from './Pages/SinglePost';
 import Upload from './components/Upload/Upload';
 import { useUser, useFollows, useLikes } from './hooks/useContexts';
-import { apiCall } from './utils/apiMiddleware';
+import { useApi } from './utils/apiComposable';
 import { User } from './types';
 
 function App() {
@@ -21,26 +21,29 @@ function App() {
   const { setLikes } = useLikes();
   const [loaded, setLoaded] = useState<boolean>(false);
 
+  // Use the new API composable
+  const { authenticate, getFollowing } = useApi();
+
   const getFollows = useCallback(async (): Promise<void> => {
     if (!currentUser?.id) {
       return;
     }
 
     try {
-      const response = (await apiCall(
-        `/api/follow/${currentUser.id}/following`
-      )) as { follows: Array<{ userFollowedId: number }> };
+      const response = await getFollowing(currentUser.id);
 
-      const followsSet = new Set<number>(
-        response.follows.map(
-          (follow: { userFollowedId: number }) => follow.userFollowedId
-        )
-      );
-      setFollows(followsSet);
-    } catch {
-      // console.error('Error fetching follows:', error);
+      if (response.data?.follows) {
+        const followsSet = new Set<number>(
+          response.data.follows.map(
+            (follow: { user_followed_id: number }) => follow.user_followed_id
+          )
+        );
+        setFollows(followsSet);
+      }
+    } catch (error) {
+      console.error('Error fetching follows:', error);
     }
-  }, [currentUser?.id, setFollows]);
+  }, [currentUser?.id, setFollows, getFollowing]);
 
   const getLikes = useCallback(async (): Promise<void> => {
     if (!currentUser?.id) {
@@ -48,59 +51,61 @@ function App() {
     }
 
     try {
-      const likesResponse = (await apiCall(
-        `/api/like/user/${currentUser.id}`
-      )) as {
-        likes: Array<{
-          likeableType: string;
-          likeableId: number;
-          id: number;
-          userId: number;
-        }>;
-      };
+      // Note: This endpoint might need to be added to the composable
+      // For now, we'll keep the direct call but with better error handling
+      const response = await fetch(`/api/like/user/${currentUser.id}`);
+      const likesResponse = await response.json();
 
-      const likesRecord: Record<
-        string,
-        {
-          id: number;
-          userId: number;
-          postId?: number;
-          commentId?: number;
-        }
-      > = {};
-      likesResponse.likes.forEach(
-        (like: {
-          likeableType: string;
-          likeableId: number;
-          id: number;
-          userId: number;
-        }) => {
-          const key = `${like.likeableType}_${like.likeableId}`;
-          likesRecord[key] = {
-            id: like.id,
-            userId: like.userId,
-            postId: like.likeableType === 'post' ? like.likeableId : undefined,
-            commentId:
-              like.likeableType === 'comment' ? like.likeableId : undefined,
-          };
-        }
-      );
-      setLikes(likesRecord);
-    } catch {
-      // console.error('Error fetching likes:', error);
+      if (likesResponse.likes) {
+        const likesRecord: Record<
+          string,
+          {
+            id: number;
+            userId: number;
+            postId?: number;
+            commentId?: number;
+          }
+        > = {};
+
+        likesResponse.likes.forEach(
+          (like: {
+            likeableType: string;
+            likeableId: number;
+            id: number;
+            userId: number;
+          }) => {
+            const key = `${like.likeableType}_${like.likeableId}`;
+            likesRecord[key] = {
+              id: like.id,
+              userId: like.userId,
+              postId:
+                like.likeableType === 'post' ? like.likeableId : undefined,
+              commentId:
+                like.likeableType === 'comment' ? like.likeableId : undefined,
+            };
+          }
+        );
+        setLikes(likesRecord);
+      }
+    } catch (error) {
+      console.error('Error fetching likes:', error);
     }
   }, [currentUser?.id, setLikes]);
 
   const authenticateUser = useCallback(async (): Promise<void> => {
     try {
-      const user = await apiCall('/api/auth/');
-      setCurrentUser(user as User);
-    } catch {
+      const response = await authenticate();
+
+      if (response.data) {
+        setCurrentUser(response.data as User);
+      }
+    } catch (error) {
       // Error means user is not authenticated, which is fine
+      console.log('User not authenticated');
     } finally {
       setLoaded(true);
     }
-  }, [setCurrentUser]);
+  }, [setCurrentUser, authenticate]);
 
   useEffect(() => {
     authenticateUser();
